@@ -1,0 +1,144 @@
+<script src='https://cdn.tailwindcss.com'></script>
+
+<section
+  style=''
+  class='text-sm grid grid-rows-[min-content_min-content_minmax(0,1fr)_min-content] h-screen'
+>
+  <div class='flex justify-between items-center'>
+    <div class='flex flex-col'>
+      <span class='font-bold text-base uppercase'>Jimenez Garrido Rubén</span>
+      <span class='uppercase'>pz. labradores</span>
+      <span class='uppercase'>Roquetas de mar 04770 almeria</span>
+      <span class=''>Tlf. 637322827</span>
+      <span class=''>CIF 46605899X</span>
+    </div>
+    <div class='flex items-center space-x-2'>
+      <img src='http://localhost:3000/logo.png' width='50' alt='' />
+      <div>
+        <h1 class='text-lg font-bold'>GRUPO GESTIÓN</h1>
+        <span class='text-xs'>GESTORES, ABOGADOS Y ECONOMISTAS</span>
+      </div>
+    </div>
+  </div>
+  {{! Cabecera }}
+  <div class='grid grid-cols-2 gap-2'>
+    <div class='grid grid-cols-2 gap-2'>
+      <div class='flex flex-col text-white border-2'>
+        <span class='bg-slate-600'>Nº Factura</span>
+        <span class='bg-white text-black'>
+          {{numero_factura}}
+          {{#with serie}}
+            /
+          {{/with}}
+          {{serie}}
+        </span>
+      </div>
+
+      <div class='flex flex-col text-white border-2'>
+        <span class='bg-slate-600'>Fecha</span>
+        <span class='bg-white text-black'>{{fechaFormateada}}</span>
+      </div>
+      <div class='flex flex-col text-white border-2'>
+        <span class='bg-slate-600'>NIF/CIF CLIENTE</span>
+        <span class='bg-white text-black'>{{cliente.CIF}}</span>
+      </div>
+      <div class='flex flex-col text-white border-2'>
+        <span class='bg-slate-600'>Nº EXPEDIENTE</span>
+        <span class='bg-white text-black'>{{numero_expediente}}</span>
+      </div>
+      <div class='flex flex-col text-white border-2'>
+        <span class='bg-slate-600'>EXPEDIDA EN</span>
+        <span class='bg-white text-black'>ROQUETAS DE MAR</span>
+      </div>
+      <div class='flex flex-col text-white border-2'>
+        <span class='bg-slate-600'>NUM. FAC. REC.</span>
+        <span class='bg-white text-black'></span>
+      </div>
+    </div>
+    <div class='flex flex-col text-white border-2'>
+      <span class='bg-slate-600'>IDENTIFICACIÓN CLIENTE</span>
+      <div class='flex flex-col text-black bg-white'>
+        <span>{{cliente.nombre}}</span>
+        <span></span>
+        <span>{{cliente.localidad}}</span>
+        <span>{{cliente.codigo_postal}} {{cliente.provincia}}</span>
+      </div>
+    </div>
+  </div>
+  {{! Contenido }}
+  <div>
+    <div class='grid mt-2 grid-cols-12 bg-slate-600 text-white gap-x-3'>
+      <div class='col-span-4'>CONCEPTO</div>
+      <div class='col-span-1'>UNID.</div>
+      <div class='col-span-1'>IMP. UNIT.</div>
+      <div class='col-span-1'>% DTO.</div>
+      <div class='col-span-2'>IMPORTE</div>
+      <div class='col-span-1'>% IVA</div>
+      <div class='col-span-1'>% RET.</div>
+    </div>
+    {{#each expedientes as |expediente num|}}
+      <div class='grid mt-2 h-12 bg-slate-200 grid-cols-12 gap-x-3'>
+        <div class='col-span-4'>{{expediente.concepto}}</div>
+        <div class='col-span-1'>{{expediente.unidades}} 1,00</div>
+        <div class='col-span-1'>{{expediente.importe}}</div>
+        <div class='col-span-1'></div>
+        <div class='col-span-2'>{{expediente.importe}}</div>
+        <div class='col-span-1'>{{expediente.IVA}}</div>
+        <div class='col-span-1'>15,00</div>
+      </div>
+    {{/each}}
+  </div>
+  {{! Pie de página }}
+  <div style='page-break-after: always;' class='grid grid-cols-12 mt-2'>
+    <div class='flex flex-col text-white border-2 col-span-3'>
+      <span class='bg-slate-600'>TOTAL CONCEPTOS</span>
+      <span class='bg-white text-black'>{{total}}</span>
+    </div>
+    <div class='flex flex-col text-white border-2 col-span-1'>
+      <span class='bg-slate-600'>% IVA</span>
+      <span class='bg-white text-black'>21,00</span>
+    </div>
+    <div class='flex flex-col text-white border-2 col-span-2'>
+      <span class='bg-slate-600'>IMPORTE IVA</span>
+      <span class='bg-white text-black'>11.13</span>
+    </div>
+    <div class='flex flex-col text-white border-2 col-span-2'>
+      <span class='bg-slate-600'>IMP. PARCIAL</span>
+      <span class='bg-white text-black'>64,13</span>
+    </div>
+    <div class='flex flex-col text-white border-2 col-span-4'>
+      <span class='bg-slate-600'>TOTAL FACTURA</span>
+      <span class='bg-white text-black font-bold text-base text-end'>64,13 €</span>
+      <div class='grid grid-cols-2 text-white border-2 col-span-4'>
+        <span class='bg-slate-600'>Base Ret.</span>
+        <span class='bg-white text-black text-end'>53,00</span>
+        <span class='bg-slate-600'>% RET.</span>
+        <span class='bg-slate-600'>IMPORTE RET.</span>
+        <span class='bg-white text-black'>15,00</span>
+        <span class='bg-white text-blacK'>7,95</span>
+      </div>
+    </div>
+    <div class='flex flex-col text-white border-2 col-span-2'>
+      <span class='bg-slate-600'>Concep. y supl.</span>
+      <span class='bg-white text-black'>64,13</span>
+    </div>
+    <div class='flex flex-col text-white border-2 col-span-2'>
+      <span class='bg-slate-600'>Total Provisiones</span>
+      <span class='bg-white text-black'></span>
+    </div>
+    <div class='flex flex-col text-white border-2 col-span-2'>
+      <span class='bg-slate-600'>Total Suplido</span>
+      <span class='bg-white text-black'></span>
+    </div>
+    <div class='grid grid-cols-6 text-white border-2 col-span-6'>
+      <span class='bg-slate-600 col-span-2'>Total Liquido</span>
+      <span
+        class='bg-white text-black col-span-4 font-bold text-base text-end'
+      >{{total}}</span>
+      <span class='bg-slate-600 col-span-2'>Total A Pagar</span>
+      <span
+        class='bg-white text-black col-span-4 font-bold text-base text-end'
+      >{{total}}</span>
+    </div>
+  </div>
+</section>
