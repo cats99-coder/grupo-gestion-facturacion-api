@@ -17,7 +17,9 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
     }),
     ClientesModule,
-    MongooseModule.forRoot('mongodb://127.0.0.1/grupo-gestion'),
+    MongooseModule.forRoot(
+      `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/grupo-gestion`,
+    ),
     UsuariosModule,
     ExpedientesModule,
     FacturasModule,
