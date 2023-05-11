@@ -4,6 +4,7 @@ services:
     build: 
       context: ../
       dockerfile: ./docker/Dockerfile
+    restart: always
     user: node
     ports:
       - 3001:3001
