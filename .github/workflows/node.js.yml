@@ -31,4 +31,4 @@ jobs:
       #     push: false
       #     load: true
       #     tags: 'facturacion-api'
-      - run: DOCKER_BUILDKIT=0 docker compose -f ./docker/docker-compose.yml up -d api mongo
+      - run: DOCKER_BUILDKIT=0 docker compose -f docker/docker-compose.yml up -d api mongo
