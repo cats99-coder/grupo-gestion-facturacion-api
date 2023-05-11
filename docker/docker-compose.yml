@@ -3,7 +3,7 @@ services:
   api:
     build: 
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./docker/Dockerfile
     user: node
     ports:
       - 3001:3001
