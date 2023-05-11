@@ -8,6 +8,8 @@ services:
     user: node
     ports:
       - 3001:3001
+    volumes:
+      - /env/.env:./env
   mongo:
     image: mongo
     restart: always
