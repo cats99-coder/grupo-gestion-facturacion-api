@@ -10,6 +10,8 @@ services:
       - 3001:3001
     volumes:
       - /env:/env
+    links:
+      - mongo 
   mongo:
     image: mongo
     restart: always

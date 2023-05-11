@@ -6,6 +6,7 @@ export class UsuariosController {
   constructor(private usuarioService: UsuariosService) {}
   @Get('')
   async getAll() {
+    console.log(process.env.DB_HOST);
     return await this.usuarioService.getAll();
   }
   @Get(':id')
