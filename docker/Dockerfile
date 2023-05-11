@@ -11,7 +11,6 @@ WORKDIR /usr/src/app
 # A wildcard is used to ensure copying both package.json AND package-lock.json (when available).
 # Copying this first prevents re-running npm install on every code change.
 COPY --chown=node:node package*.json ./
-COPY --chown=node:node ../.env ./
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
 RUN npm ci
@@ -57,7 +56,6 @@ FROM node:18-alpine As production
 # Copy the bundled code from the build stage to the production image
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/dist .
-COPY --chown=node:node --from=build /usr/src/app/.env .env
 EXPOSE 3001
 
 CMD ["node", "main.js"]
