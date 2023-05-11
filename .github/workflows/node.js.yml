@@ -23,12 +23,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - run: ls docker -l
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./docker/Dockerfile
-          push: false
-          load: true
-          tags: 'facturacion-api'
+      # - name: Build and push Docker image
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: .
+      #     file: ./docker/Dockerfile
+      #     push: false
+      #     load: true
+      #     tags: 'facturacion-api'
       - run: DOCKER_BUILDKIT=0 docker compose -f ./docker/docker-compose.yml up -d api mongo
