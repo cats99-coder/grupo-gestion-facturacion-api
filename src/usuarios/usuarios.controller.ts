@@ -4,14 +4,8 @@ import { UsuariosService } from './usuarios.service';
 export class UsuariosController {
   constructor(private usuarioService: UsuariosService) {}
   @Get('install')
-  async install(@Req() req: Request) {
-    console.log(req.headers);
-    if (
-      req.headers.has('Origin') &&
-      req.headers.get('Origin') === 'http://localhost'
-    ) {
-      return await this.usuarioService.install();
-    }
+  async install() {
+    return await this.usuarioService.install();
   }
   @Get('')
   async getAll() {
