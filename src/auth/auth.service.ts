@@ -10,10 +10,10 @@ export class AuthService {
   ) {}
   async signIn(username: string, pass: string): Promise<any> {
     const user = (await this.usuariosService.getByUser(username)).toObject();
+    console.log(user)
     if (user?.password !== pass || user === null) {
       throw new UnauthorizedException();
     }
-    const { password, ...result } = user;
     const payload = {
       _id: user._id,
       usuario: user.usuario,

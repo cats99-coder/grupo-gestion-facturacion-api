@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable, StreamableFile } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  StreamableFile,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Factura } from './schemas/factura.schema';
@@ -7,6 +12,7 @@ import { join } from 'path';
 import * as fs from 'fs/promises';
 import Handlebars from 'handlebars';
 import puppeteer from 'puppeteer';
+import { calculoTotales } from './utils/facturas';
 @Injectable()
 export class FacturasService {
   constructor(
@@ -29,6 +35,17 @@ export class FacturasService {
       .populate(['usuario', 'cliente']);
   }
   async maxByType({ tipo, serie }: { tipo: string; serie?: string }) {
+    //Tipo Abogacía
+    if (tipo === 'ABOGACIA') {
+      const maximo = await this.facturaModel
+        .find({ tipo: 'ABOGACIA' })
+        .sort({ numero_factura: -1 })
+        .limit(1)
+        .exec();
+      const numero_factura =
+        maximo.length === 0 ? 1 : maximo[0].numero_factura + 1;
+      return { numero_factura, tipo };
+    }
     //Tipo Gestoria
     if (tipo === 'GESTORIA') {
       const maximo = await this.facturaModel
@@ -92,12 +109,16 @@ export class FacturasService {
       if (clientes.length === 0) throw new Error('No tiene clientes');
       if (tipos.length === 0) throw new Error('Falta algún tipo un expediente');
     } catch (err) {
-      throw new HttpException({
-        status: HttpStatus.EXPECTATION_FAILED,
-        error: err,
-      }, HttpStatus.EXPECTATION_FAILED, {
-        cause: err
-      });
+      throw new HttpException(
+        {
+          status: HttpStatus.EXPECTATION_FAILED,
+          error: err,
+        },
+        HttpStatus.EXPECTATION_FAILED,
+        {
+          cause: err,
+        },
+      );
     }
     //----------------------------------------------------
 
@@ -119,6 +140,30 @@ export class FacturasService {
     return facturaDocument;
   }
   async imprimirFactura(id) {
+    Handlebars.registerHelper('price', (price: string) => {
+      if (!price) {
+        return Number(0).toLocaleString('es', {
+          style: 'currency',
+          currency: 'EUR',
+        });
+      }
+      const priceNumber = Number(price);
+      return priceNumber.toLocaleString('es', {
+        style: 'currency',
+        currency: 'EUR',
+      });
+    });
+    Handlebars.registerHelper('percent', (percent: string) => {
+      if (!percent) {
+        return Number(0).toLocaleString('es', {
+          style: 'percent',
+        });
+      }
+      const priceNumber = Number(percent) / 100;
+      return priceNumber.toLocaleString('es', {
+        style: 'percent',
+      });
+    });
     const factura = (await this.getById(id)).toObject();
     const filePath = join(process.cwd(), 'templates', `factura.hbs`);
     const html = await fs.readFile(filePath, { encoding: 'utf8' });
@@ -128,8 +173,6 @@ export class FacturasService {
       const { expedientes } = factura;
       const items = expedientes.length;
       const numeroPaginas = Math.ceil(items / num);
-      console.log('Número de factura', factura.numero_factura);
-      console.log('Serie enviada', factura.serie);
       for (let i = 0; i < numeroPaginas; i++) {
         if (i * num + num < items) {
           const exp = expedientes.slice(i * num, num);
@@ -145,13 +188,8 @@ export class FacturasService {
     const fecha = new Date(factura.fecha).toLocaleDateString();
     const fechaFormateada = fecha;
     //Calcular el total de la factura
-    const total = factura.expedientes.reduce((prev, currentValue) => {
-      if (currentValue.importe && currentValue.unidades) {
-        return prev + currentValue.importe * currentValue.unidades;
-      }
-      return prev;
-    }, 0);
-    const htmlCompiled = paginacion({ ...factura, total, fechaFormateada }, 10);
+    const totales = calculoTotales(factura)
+    const htmlCompiled = paginacion({ ...factura, totales, fechaFormateada }, 10);
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setContent(htmlCompiled);

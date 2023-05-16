@@ -4,9 +4,12 @@ import { UsuariosService } from './usuarios.service';
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private usuarioService: UsuariosService) {}
+  @Get('install')
+  async install() {
+    return await this.usuarioService.install();
+  }
   @Get('')
   async getAll() {
-    console.log(process.env.DB_HOST);
     return await this.usuarioService.getAll();
   }
   @Get(':id')
