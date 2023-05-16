@@ -9,7 +9,9 @@ import { ContratoAutonomo } from './dto/documentos';
 @Injectable()
 export class FiscalService {
   constructor(private clientesService: ClientesService) {}
-  async imprimirContratoAutonomo(params: ContratoAutonomo): Promise<StreamableFile> {
+  async imprimirContratoAutonomo(
+    params: ContratoAutonomo,
+  ): Promise<StreamableFile> {
     //Preparando la plantilla
     const filePath = join(
       process.cwd(),
@@ -23,9 +25,9 @@ export class FiscalService {
     //Cargar Datos del cliente
     const cliente = (await this.clientesService.getById(params._id)).toObject();
     //Fecha
-    const fecha = new Date().toLocaleString()
-    const htmlCompiled = compile({cliente, fecha});
-    const browser = await puppeteer.launch();
+    const fecha = new Date().toLocaleString();
+    const htmlCompiled = compile({ cliente, fecha });
+    const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     await page.setContent(htmlCompiled);
 
