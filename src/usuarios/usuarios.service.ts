@@ -33,8 +33,7 @@ export class UsuariosService {
           email: 'cristianandrestabaresserna@gmail.com',
           nombre: 'Cristian Andrés Tabares Serna',
           password: '1234',
-          roles: ['fiscal', 'abogacia', 'gestoria'],
-          changePassword: false,
+          roles: ['RUBEN'],
           usuario: 'Cristian',
         },
       ]);
