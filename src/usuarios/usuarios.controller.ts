@@ -5,7 +5,7 @@ export class UsuariosController {
   constructor(private usuarioService: UsuariosService) {}
   @Get('install')
   async install(@Req() req: Request) {
-    console.log(req.headers.get('Origin'));
+    console.log(req.headers);
     if (
       req.headers.has('Origin') &&
       req.headers.get('Origin') === 'http://localhost'
