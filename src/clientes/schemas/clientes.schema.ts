@@ -28,6 +28,8 @@ export class Cliente {
   @Prop()
   email: string;
   @Prop()
+  telefono: string;
+  @Prop()
   numero_cuenta: string;
   @Prop()
   codigo_postal: string;
