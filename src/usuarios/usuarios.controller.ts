@@ -1,12 +1,17 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
-
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private usuarioService: UsuariosService) {}
   @Get('install')
-  async install() {
-    return await this.usuarioService.install();
+  async install(@Req() req: Request) {
+    console.log(req.headers.get('Origin'));
+    if (
+      req.headers.has('Origin') &&
+      req.headers.get('Origin') === 'http://localhost'
+    ) {
+      return await this.usuarioService.install();
+    }
   }
   @Get('')
   async getAll() {

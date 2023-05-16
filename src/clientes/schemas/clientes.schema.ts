@@ -7,6 +7,14 @@ export type ClienteDocument = HydratedDocument<Cliente>;
 class Contacto {
   @Prop()
   nombre: string;
+  @Prop()
+  apellido1: string;
+  @Prop()
+  apellido2: string;
+  @Prop()
+  telefono: string;
+  @Prop()
+  email: string;
 }
 
 const ContactoSchema = SchemaFactory.createForClass(Contacto);

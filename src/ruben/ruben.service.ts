@@ -1,22 +1,35 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
-import { join } from 'path';
-import puppeteer from 'puppeteer';
-import * as fs from 'fs/promises';
 import { ClientesService } from 'src/clientes/clientes.service';
-import Handlebars from 'handlebars';
 import { ContratoAutonomo } from './dto/documentos';
+import { join } from 'path';
+import * as fs from 'fs/promises';
+import puppeteer from 'puppeteer';
+import Handlebars from 'handlebars';
 
 @Injectable()
-export class FiscalService {
+export class RubenService {
   constructor(private clientesService: ClientesService) {}
   async imprimirContratoAutonomo(
     params: ContratoAutonomo,
   ): Promise<StreamableFile> {
+    Handlebars.registerHelper('price', (price: string) => {
+      if (!price) {
+        return Number(0).toLocaleString('es', {
+          style: 'currency',
+          currency: 'EUR',
+        });
+      }
+      const priceNumber = Number(price);
+      return priceNumber.toLocaleString('es', {
+        style: 'currency',
+        currency: 'EUR',
+      });
+    });
     //Preparando la plantilla
     const filePath = join(
       process.cwd(),
       'templates',
-      'fiscal',
+      'ruben',
       `contrato_autonomo.hbs`,
     );
     const html = await fs.readFile(filePath, { encoding: 'utf-8' });
@@ -26,7 +39,7 @@ export class FiscalService {
     const cliente = (await this.clientesService.getById(params._id)).toObject();
     //Fecha
     const fecha = new Date().toLocaleString();
-    const htmlCompiled = compile({ cliente, fecha });
+    const htmlCompiled = compile({ cliente, fecha, ...params });
     const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     await page.setContent(htmlCompiled);

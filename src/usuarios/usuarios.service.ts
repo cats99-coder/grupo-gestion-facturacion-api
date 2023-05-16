@@ -26,16 +26,18 @@ export class UsuariosService {
     });
   }
   async install() {
-    const usuarios = await this.usuariosModel.find({})
-    if(usuarios.length === 0) {
-      await this.usuariosModel.create({
-        email: 'cristianandrestabaresserna@gmail.com',
-        nombre: 'Cristian Andrés Tabares Serna',
-        password: '1234',
-        roles: ['fiscal', 'abogacia', 'gestoria'],
-        changePassword: false,
-        usuario: 'Cristian'
-      })
+    const usuarios = await this.usuariosModel.find({});
+    if (usuarios.length === 0) {
+      await this.usuariosModel.create([
+        {
+          email: 'cristianandrestabaresserna@gmail.com',
+          nombre: 'Cristian Andrés Tabares Serna',
+          password: '1234',
+          roles: ['fiscal', 'abogacia', 'gestoria'],
+          changePassword: false,
+          usuario: 'Cristian',
+        },
+      ]);
     }
   }
 }

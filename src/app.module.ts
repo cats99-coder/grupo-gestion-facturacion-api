@@ -7,9 +7,9 @@ import { UsuariosModule } from './usuarios/usuarios.module';
 import { ExpedientesModule } from './expedientes/expedientes.module';
 import { FacturasModule } from './facturas/facturas.module';
 import { ServiciosModule } from './servicios/servicios.module';
-import { FiscalModule } from './fiscal/fiscal.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { RubenModule } from './ruben/ruben.module';
 
 @Module({
   imports: [
@@ -25,8 +25,8 @@ import { ConfigModule } from '@nestjs/config';
     ExpedientesModule,
     FacturasModule,
     ServiciosModule,
-    FiscalModule,
     AuthModule,
+    RubenModule,
   ],
   controllers: [AppController],
   providers: [AppService],

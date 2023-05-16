@@ -1,16 +1,16 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
-import { FiscalService } from './fiscal.service';
 import { ContratoAutonomo } from './dto/documentos';
+import { RubenService } from './ruben.service';
 
-@Controller('fiscal')
-export class FiscalController {
-  constructor(private fiscalService: FiscalService) {}
+@Controller('ruben')
+export class RubenController {
+  constructor(private rubenService: RubenService) {}
+  
   @Post('contrato-autonomo')
   async imprimirContratoAutonomo(
     @Res({ passthrough: true }) res,
     @Body() params: ContratoAutonomo,
   ) {
-    
     res.set({
       // pdf
       'Content-Type': 'application/pdf',
@@ -20,6 +20,6 @@ export class FiscalController {
       Pragma: 'no-cache',
       Expires: 0,
     });
-    return await this.fiscalService.imprimirContratoAutonomo(params);
+    return await this.rubenService.imprimirContratoAutonomo(params);
   }
 }
