@@ -33,18 +33,13 @@
           {{serie}}
         </span>
       </div>
-
       <div class='flex flex-col text-white border-2'>
         <span class='bg-slate-600'>Fecha</span>
         <span class='bg-white text-black'>{{fechaFormateada}}</span>
       </div>
-      <div class='flex flex-col text-white border-2'>
+      <div class='flex flex-col col-span-2 text-white border-2'>
         <span class='bg-slate-600'>NIF/CIF CLIENTE</span>
         <span class='bg-white text-black'>{{cliente.NIF}}</span>
-      </div>
-      <div class='flex flex-col text-white border-2'>
-        <span class='bg-slate-600'>Nº EXPEDIENTE</span>
-        <span class='bg-white text-black'>{{numero_expediente}}</span>
       </div>
       <div class='flex flex-col text-white border-2'>
         <span class='bg-slate-600'>EXPEDIDA EN</span>
@@ -84,14 +79,25 @@
         <div class='col-span-1'>{{percent expediente.descuento}}</div>
         <div class='col-span-2'>{{price expediente.importe}}</div>
         <div class='col-span-1'>{{percent expediente.IVA}}</div>
-        <div class='col-span-1'>{{percent totales.retencion}}</div>
+        <div class='col-span-1'>{{percent ../totales.retencion}}</div>
       </div>
+      {{#each expediente.suplidos as |suplido num|}}
+        <div class='grid mt-2 h-min text-xs grid-cols-12 gap-x-3'>
+          <div class='col-span-4'>{{suplido.concepto}}</div>
+          <div class='col-span-1'>1,00</div>
+          <div class='col-span-2'>{{price suplido.importe}}</div>
+          <div class='col-span-1'></div>
+          <div class='col-span-2'></div>
+          <div class='col-span-1'></div>
+          <div class='col-span-1'></div>
+        </div>
+      {{/each}}
     {{/each}}
   </div>
   {{! Pie de página }}
   <div style='page-break-after: always;' class='grid grid-cols-12 mt-2'>
     <div class='flex flex-col text-white border-2 col-span-3'>
-      <span class='bg-slate-600'>TOTAL CONCEPTOS</span>
+      <span class='bg-slate-600'>BASE IMPONIBLE</span>
       <div class='bg-white text-black'>
         {{#each totales.IVAs}}
           <div>
@@ -111,7 +117,7 @@
       </span>
     </div>
     <div class='flex flex-col text-white border-2 col-span-2'>
-      <span class='bg-slate-600'>IMPORTE IVA</span>
+      <span class='bg-slate-600'>IMP. IVA</span>
       <span class='bg-white text-black'>
         {{#each totales.IVAs}}
           <div>
@@ -137,36 +143,34 @@
         }}</span>
       <div class='grid grid-cols-2 text-white border-2 col-span-4'>
         <span class='bg-slate-600'>Base Ret.</span>
-        <span class='bg-white text-black text-end'>{{price totales.total_retencion}}</span>
+        <span class='bg-white text-black text-end'>{{price
+            totales.total_retencion
+          }}</span>
         <span class='bg-slate-600'>% RET.</span>
         <span class='bg-slate-600'>IMPORTE RET.</span>
         <span class='bg-white text-black'>{{percent totales.retencion}}</span>
-        <span class='bg-white text-blacK'>{{price totales.importe_retencion}}</span>
+        <span class='bg-white text-blacK'>{{price
+            totales.importe_retencion
+          }}</span>
       </div>
     </div>
-    <div class='flex flex-col text-white border-2 col-span-2'>
-      <span class='bg-slate-600'>Concep. y supl.</span>
-      <span class='bg-white text-black'>{{price
-          totales.total_complementos
-        }}</span>
-    </div>
-    <div class='flex flex-col text-white border-2 col-span-2'>
+    <div class='flex flex-col text-white border-2 col-span-3'>
       <span class='bg-slate-600'>Total Provisiones</span>
-      <span class='bg-white text-black'>{{price total_provisiones}}</span>
+      <span class='bg-white text-black'>{{price totales.total_provisiones}}</span>
     </div>
-    <div class='flex flex-col text-white border-2 col-span-2'>
+    <div class='flex flex-col text-white border-2 col-span-3'>
       <span class='bg-slate-600'>Total Suplido</span>
-      <span class='bg-white text-black'>{{price total_suplido}}</span>
+      <span class='bg-white text-black'>{{price totales.total_suplidos}}</span>
     </div>
     <div class='grid grid-cols-6 text-white border-2 col-span-6'>
       <span class='bg-slate-600 col-span-2'>Total Liquido</span>
       <span
         class='bg-white text-black col-span-4 font-bold text-base text-end'
-      >{{price total_liquido}}</span>
+      >{{price totales.total_liquido}}</span>
       <span class='bg-slate-600 col-span-2'>Total A Pagar</span>
       <span
         class='bg-white text-black col-span-4 font-bold text-base text-end'
-      >{{price total_pagar}}</span>
+      >{{price totales.total_a_pagar}}</span>
     </div>
   </div>
 </section>

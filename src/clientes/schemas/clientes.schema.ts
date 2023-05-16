@@ -15,8 +15,16 @@ const ContactoSchema = SchemaFactory.createForClass(Contacto);
 export class Cliente {
   @Prop({ required: true })
   NIF: string;
-  @Prop({ required: true })
+  @Prop({ default: 'PERSONA' })
+  tipo: 'EMPRESA' | 'PERSONA';
+  @Prop()
+  razon_social: string;
+  @Prop()
   nombre: string;
+  @Prop()
+  apellido1: string;
+  @Prop()
+  apellido2: string;
   @Prop()
   email: string;
   @Prop()
@@ -29,7 +37,7 @@ export class Cliente {
   provincia: string;
   @Prop()
   pais: string;
-  @Prop({default: false})
+  @Prop({ default: false })
   retencion: boolean;
   @Prop({ type: [ContactoSchema] })
   contactos: Contacto[];

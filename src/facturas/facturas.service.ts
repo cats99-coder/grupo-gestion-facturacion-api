@@ -189,6 +189,7 @@ export class FacturasService {
     const fechaFormateada = fecha;
     //Calcular el total de la factura
     const totales = calculoTotales(factura);
+    console.log(totales);
     const htmlCompiled = paginacion(
       { ...factura, totales, fechaFormateada },
       10,
