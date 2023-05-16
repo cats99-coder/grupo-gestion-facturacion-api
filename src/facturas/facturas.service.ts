@@ -188,9 +188,15 @@ export class FacturasService {
     const fecha = new Date(factura.fecha).toLocaleDateString();
     const fechaFormateada = fecha;
     //Calcular el total de la factura
-    const totales = calculoTotales(factura)
-    const htmlCompiled = paginacion({ ...factura, totales, fechaFormateada }, 10);
-    const browser = await puppeteer.launch({ headless: true });
+    const totales = calculoTotales(factura);
+    const htmlCompiled = paginacion(
+      { ...factura, totales, fechaFormateada },
+      10,
+    );
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox'],
+    });
     const page = await browser.newPage();
     await page.setContent(htmlCompiled);
     const pdf = await page.pdf({
