@@ -19,9 +19,9 @@ export class FacturasService {
     @InjectModel('factura') private facturaModel: Model<Factura>,
     private expedientesService: ExpedientesService,
   ) {}
-  async getAll() {
+  async getAll(req: Request) {
     return await this.facturaModel
-      .find()
+      .find({ tipo: req['user']['rol'] })
       .populate(['usuario', 'cliente', 'expedientes']);
   }
   async getById(id) {
@@ -29,16 +29,16 @@ export class FacturasService {
       .findById(id)
       .populate(['usuario', 'cliente', 'expedientes']);
   }
-  async getByClient(cliente: string) {
+  async getByClient(req: Request, cliente: string) {
     return await this.facturaModel
-      .find({ cliente: { $eq: cliente } })
+      .find({ cliente: { $eq: cliente }, tipo: req['user']['rol'] })
       .populate(['usuario', 'cliente']);
   }
   async maxByType({ tipo, serie }: { tipo: string; serie?: string }) {
     //Tipo Abogacía
-    if (tipo === 'ABOGACIA') {
+    if (tipo === 'INMA') {
       const maximo = await this.facturaModel
-        .find({ tipo: 'ABOGACIA' })
+        .find({ tipo: 'INMA' })
         .sort({ numero_factura: -1 })
         .limit(1)
         .exec();
@@ -47,9 +47,9 @@ export class FacturasService {
       return { numero_factura, tipo };
     }
     //Tipo Gestoria
-    if (tipo === 'GESTORIA') {
+    if (tipo === 'ANDREA') {
       const maximo = await this.facturaModel
-        .find({ tipo: 'GESTORIA' })
+        .find({ tipo: 'ANDREA' })
         .sort({ numero_factura: -1 })
         .limit(1)
         .exec();
@@ -58,13 +58,12 @@ export class FacturasService {
       return { numero_factura, tipo };
     }
     //Tipo Fiscal
-    if (tipo === 'FISCAL') {
+    if (tipo === 'RUBEN') {
       const maximo = await this.facturaModel
-        .find({ tipo: 'FISCAL', serie })
+        .find({ tipo: 'RUBEN', serie })
         .sort({ numero_factura: -1 })
         .limit(1)
         .exec();
-      console.log(serie);
       const numero_factura =
         maximo.length === 0 ? 1 : maximo[0].numero_factura + 1;
       return { numero_factura, tipo, serie };
@@ -100,14 +99,15 @@ export class FacturasService {
         if (clienteIncluded) {
           clientes.push(expediente.cliente);
         }
-        if (!tipos.includes(factura.tipo)) {
-          tipos.push(factura.tipo);
+        if (!tipos.includes(expediente.tipo)) {
+          tipos.push(expediente.tipo);
         }
         if (clientes.length > 1) throw new Error('Hay más de un cliente');
         if (tipos.length > 1) throw new Error('Hay más de un tipo');
       });
       if (clientes.length === 0) throw new Error('No tiene clientes');
       if (tipos.length === 0) throw new Error('Falta algún tipo un expediente');
+      console.log(tipos);
     } catch (err) {
       throw new HttpException(
         {
@@ -121,7 +121,6 @@ export class FacturasService {
       );
     }
     //----------------------------------------------------
-
     //Generamos el último número de factura por tipo
     const maximo = await this.maxByType({
       tipo: tipos[0],

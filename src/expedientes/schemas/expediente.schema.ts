@@ -53,7 +53,7 @@ export class Expediente {
   @Prop({ default: 0 })
   colaborador: number;
   @Prop({ default: 'FISCAL' })
-  tipo: 'FISCAL' | 'GESTORIA' | 'ABOGACIA';
+  tipo: 'RUBEN' | 'INMA' | 'ANDREA';
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'factura' })
   factura: Factura;
 }

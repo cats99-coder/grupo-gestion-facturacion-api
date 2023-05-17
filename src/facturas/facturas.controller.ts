@@ -1,20 +1,30 @@
-import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Res,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { FacturasService } from './facturas.service';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('facturas')
+@UseGuards(AuthGuard)
 export class FacturasController {
   constructor(private facturasService: FacturasService) {}
   @Get('')
-  async getAll() {
-    return await this.facturasService.getAll();
+  async getAll(@Req() req: Request) {
+    return await this.facturasService.getAll(req);
   }
   @Post('')
   async create(@Body() factura) {
     return await this.facturasService.create(factura);
   }
   @Post('porCliente')
-  async getByClient(@Body('cliente') cliente) {
-    return await this.facturasService.getByClient(cliente);
+  async getByClient(@Req() req: Request, @Body('cliente') cliente) {
+    return await this.facturasService.getByClient(req, cliente);
   }
   @Post('imprimir')
   async imprimir(@Res({ passthrough: true }) res, @Body('id') id) {

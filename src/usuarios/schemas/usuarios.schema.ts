@@ -16,7 +16,7 @@ export class Usuario {
   @Prop({ default: true })
   changePassword: boolean;
   @Prop()
-  roles: 'RUBEN' | 'CRISTINA' | 'ANDREA';
+  rol: 'RUBEN' | 'CRISTINA' | 'ANDREA';
 }
 
 export const UsuarioSchema = SchemaFactory.createForClass(Usuario);

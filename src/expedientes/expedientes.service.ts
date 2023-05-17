@@ -8,20 +8,19 @@ export class ExpedientesService {
   constructor(
     @InjectModel('expediente') private expedienteModel: Model<Expediente>,
   ) {}
-  async getAll() {
+  async getAll(request: Request) {
     return await this.expedienteModel
-      .find()
+      .find({ tipo: request['user']['rol'] })
       .populate(['usuario', 'cliente', 'factura']);
   }
-  async getByDepartament(departamento) {
+  async getByDepartament(req: Request) {
     return await this.expedienteModel
-      .find({ tipo: departamento, factura: { $exists: false } })
+      .find({ tipo: req['user']['rol'], factura: { $exists: false } })
       .populate(['usuario', 'cliente', 'factura']);
   }
-  async getByClient(cliente: string) {
-    console.log(cliente)
+  async getByClient(req: Request, cliente: string) {
     return await this.expedienteModel
-      .find({ cliente: { $eq: cliente } })
+      .find({ cliente: { $eq: cliente }, tipo: req['user']['rol'] })
       .populate(['usuario', 'cliente', 'factura']);
   }
   async getById(_id) {
@@ -29,7 +28,7 @@ export class ExpedientesService {
       .findById(_id)
       .populate(['usuario', 'cliente', 'factura']);
   }
-  async create(expediente) {
+  async create(req: Request, expediente) {
     const maximo = await this.expedienteModel
       .find()
       .sort({ numero_expediente: -1 })
@@ -40,6 +39,7 @@ export class ExpedientesService {
     return await this.expedienteModel.create({
       numero_expediente,
       ...expediente,
+      tipo: req['user']['rol'],
     });
   }
   async update(id, expediente) {
