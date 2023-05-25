@@ -5,6 +5,7 @@ import { join } from 'path';
 import * as fs from 'fs/promises';
 import puppeteer from 'puppeteer';
 import Handlebars from 'handlebars';
+import { fechaLarga } from 'utils/fecha';
 
 @Injectable()
 export class RubenService {
@@ -38,8 +39,9 @@ export class RubenService {
     //Cargar Datos del cliente
     const cliente = (await this.clientesService.getById(params._id)).toObject();
     //Fecha
-    const fecha = new Date().toLocaleString();
-    const htmlCompiled = compile({ cliente, fecha, ...params });
+    const fecha = fechaLarga();
+    console.log(fecha)
+    const htmlCompiled = compile({ ...params, cliente, fecha,  });
     const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     await page.setContent(htmlCompiled);

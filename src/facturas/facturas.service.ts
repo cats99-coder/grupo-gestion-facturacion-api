@@ -18,6 +18,7 @@ import {
   cabeceraRuben,
   calculoTotales,
 } from './utils/facturas';
+import { fechaCorta } from 'utils/fecha';
 @Injectable()
 export class FacturasService {
   constructor(
@@ -90,7 +91,7 @@ export class FacturasService {
       await asyncEvery(factura.expedientes, async (idExpediente) => {
         console.log(idExpediente);
         const expediente = await this.expedientesService.getById(idExpediente);
-        console.log(expediente)
+        console.log(expediente);
         if (expediente.factura !== undefined && expediente.factura !== null) {
           console.log('Ya tiene Factura');
           return false;
@@ -203,9 +204,8 @@ export class FacturasService {
         return cabeceraAndrea;
       }
     })();
-    console.log(cabecera);
     //Fecha
-    const fecha = new Date(factura.fecha).toLocaleDateString();
+    const fecha = fechaCorta(new Date(factura.fecha));
     const fechaFormateada = fecha;
     //Calcular el total de la factura
     const totales = calculoTotales(factura);

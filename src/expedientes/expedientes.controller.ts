@@ -34,6 +34,10 @@ export class ExpedientesController {
   async getByClient(@Req() req: Request, @Body('cliente') cliente) {
     return await this.expedientesService.getByClient(req, cliente);
   }
+  @Post('colaboraciones')
+  async getColaboraciones(@Body('usuario') usuario) {
+    return await this.expedientesService.getColaboraciones(usuario);
+  }
   @Post(':id')
   async update(@Body() expediente, @Param('id') id) {
     return await this.expedientesService.update(id, expediente);

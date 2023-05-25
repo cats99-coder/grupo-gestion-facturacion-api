@@ -12,10 +12,10 @@
 </div>
 
 <section class='space-y-2'>
-  <p>En Roquetas de {{fecha}}</p>
+  <p>En Roquetas a {{fecha}}</p>
   <p>
     De una parte, D.
-    {{cliente.nombre}}, con DNI/NIE
+    {{cliente.nombreCompleto}}, con DNI/NIE
     {{cliente.NIF}}, con domicilio en -
     {{cliente.localidad}},
     {{cliente.provincia}}
@@ -36,7 +36,7 @@
   </p>
   <p>
     2º.‐ Que
-    {{cliente.nombre}}, está interesada en los servicios profesionales de la
+    {{cliente.nombreCompleto}}, está interesada en los servicios profesionales de la
     empresa antes referida, por lo que ambas partes llevan a cabo el presente
     contrato de prestación de servicios, y para ello establecen las siguientes:
   </p>
@@ -44,7 +44,7 @@
   <strong>ESTIPULACIONES: </strong>
   <p>
     <strong> Primera.‐</strong>
-    {{cliente.nombre}}
+    {{cliente.nombreCompleto}}
     contrata los servicios de Gestoría GrupoGestión para el asesoramiento e
     intervención en todos los asuntos que se deriven de la actuación de la
     entidad contratante y concretamente en los aspectos relacionados con la
@@ -128,7 +128,7 @@
     <p>Cliente</p>
     <p class='col-span-2 h-24'></p>
     <p>Fdo. Rubén Jiménez Garrido</p>
-    <p>Fdo. {{cliente.nombre}}</p>
+    <p>Fdo. {{cliente.nombreCompleto}}</p>
   </div>
 </section>
 <div class='flex justify-center items-center space-x-2 mb-2 break-before-page'>
@@ -199,7 +199,7 @@
     CONTRATO PARA EL TRATAMIENTO DE DATOS PERSONALES POR CUENTA DE TERCERO.
   </h1>
   <p class='text-right'>
-    Roquetas de Mar, 13, de noviembre, de 2019.
+    {{fecha}}
   </p>
   <p>
 
@@ -238,12 +238,12 @@
     <div class='border-2 w-5 h-5'></div>
   </div>
   <div class='grid grid-cols-2'>
-    <p>El CLIENTE</p>
     <p>EL ENCARCADO DEL TRATAMIENTO</p>
+    <p>El CLIENTE</p>
     <p class='col-span-2 h-24'></p>
     <p>Fdo. Rubén Jiménez Garrido</p>
     <div>
-      <p>Fdo. {{cliente.nombre}}</p>
+      <p>Fdo. {{cliente.nombreCompleto}}</p>
       <p>DNI/NIE {{cliente.NIF}}</p>
     </div>
   </div>

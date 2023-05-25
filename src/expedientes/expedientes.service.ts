@@ -54,4 +54,14 @@ export class ExpedientesService {
     });
     return true;
   }
+  async getColaboraciones(usuario: string) {
+    const expedientes = await this.expedienteModel.find({
+      'colaboradores.colaborador': {
+        $elemMatch: {
+          importe: 120,
+        },
+      },
+    });
+    return expedientes;
+  }
 }
