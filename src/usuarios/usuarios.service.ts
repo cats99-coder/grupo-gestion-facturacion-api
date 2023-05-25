@@ -50,6 +50,13 @@ export class UsuariosService {
           rol: 'ANDREA',
           usuario: 'andrea',
         },
+        {
+          email: 'cristina@gmail.com',
+          nombre: 'Cristina',
+          password: '1234',
+          rol: 'CRISTINA',
+          usuario: 'cristina',
+        },
       ]);
     }
   }

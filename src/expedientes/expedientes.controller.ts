@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { ExpedientesService } from './expedientes.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 
@@ -19,8 +27,8 @@ export class ExpedientesController {
     return await this.expedientesService.create(req, expediente);
   }
   @Post('porFacturar')
-  async getByDepartament(@Req() req: Request) {
-    return await this.expedientesService.getByDepartament(req);
+  async getByTipo(@Req() req: Request) {
+    return await this.expedientesService.getByTipo(req);
   }
   @Post('porCliente')
   async getByClient(@Req() req: Request, @Body('cliente') cliente) {

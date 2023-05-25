@@ -10,6 +10,7 @@ import { ServiciosModule } from './servicios/servicios.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { RubenModule } from './ruben/ruben.module';
+import { ColaboradoresModule } from './colaboradores/colaboradores.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { RubenModule } from './ruben/ruben.module';
     ServiciosModule,
     AuthModule,
     RubenModule,
+    ColaboradoresModule,
   ],
   controllers: [AppController],
   providers: [AppService],

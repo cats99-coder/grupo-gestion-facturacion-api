@@ -60,3 +60,28 @@ export const calculoTotales = (factura: Factura) => {
     total_a_pagar,
   };
 };
+
+export const cabeceraRuben = {
+  nombre: 'JIMENEZ GARRIDO RUBÉN',
+  calle: 'PL. LABRADORES',
+  direccion: 'ROQUETAS DE MAR 04740 ALMERIA',
+  telefono: '637322827',
+  fax: '',
+  CIF: '46605899X'
+}
+export const cabeceraInma = {
+  nombre: 'MARIA INMACULADA MARTÍN LIÑÁN',
+  calle: 'PL. LABRADORES',
+  direccion: 'ROQUETAS DE MAR 04740 ALMERIA',
+  telefono: '',
+  fax: '',
+  CIF: '45600487C'
+}
+export const cabeceraAndrea = {
+  nombre: 'ANDREA MARTÍN LIÑÁN',
+  calle: 'PL. LABRADORES',
+  direccion: 'ROQUETAS DE MAR 04740 ALMERIA',
+  telefono: '',
+  fax: '',
+  CIF: '45600489E'
+}

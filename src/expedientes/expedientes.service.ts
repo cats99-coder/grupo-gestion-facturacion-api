@@ -11,22 +11,23 @@ export class ExpedientesService {
   async getAll(request: Request) {
     return await this.expedienteModel
       .find({ tipo: request['user']['rol'] })
-      .populate(['usuario', 'cliente', 'factura']);
+      .populate(['usuario', 'cliente', 'factura'])
+      .populate('colaboradores.usuario');
   }
-  async getByDepartament(req: Request) {
+  async getByTipo(req: Request) {
     return await this.expedienteModel
       .find({ tipo: req['user']['rol'], factura: { $exists: false } })
-      .populate(['usuario', 'cliente', 'factura']);
+      .populate(['usuario', 'cliente', 'factura', 'colaboradores.usuario']);
   }
   async getByClient(req: Request, cliente: string) {
     return await this.expedienteModel
       .find({ cliente: { $eq: cliente }, tipo: req['user']['rol'] })
-      .populate(['usuario', 'cliente', 'factura']);
+      .populate(['usuario', 'cliente', 'factura', 'colaboradores.usuario']);
   }
   async getById(_id) {
     return await this.expedienteModel
       .findById(_id)
-      .populate(['usuario', 'cliente', 'factura']);
+      .populate(['usuario', 'cliente', 'factura', 'colaboradores.usuario']);
   }
   async create(req: Request, expediente) {
     const maximo = await this.expedienteModel
@@ -35,7 +36,7 @@ export class ExpedientesService {
       .limit(1)
       .exec();
     const numero_expediente =
-      maximo.length === 0 ? 1 : maximo[0].numero_expediente + 1;
+      maximo.length === 0 ? 230001 : maximo[0].numero_expediente + 1;
     return await this.expedienteModel.create({
       numero_expediente,
       ...expediente,

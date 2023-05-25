@@ -12,7 +12,12 @@ import { join } from 'path';
 import * as fs from 'fs/promises';
 import Handlebars from 'handlebars';
 import puppeteer from 'puppeteer';
-import { calculoTotales } from './utils/facturas';
+import {
+  cabeceraAndrea,
+  cabeceraInma,
+  cabeceraRuben,
+  calculoTotales,
+} from './utils/facturas';
 @Injectable()
 export class FacturasService {
   constructor(
@@ -183,14 +188,26 @@ export class FacturasService {
       }
       return result;
     };
+    //Creación de la cabecera
+    const cabecera = (() => {
+      if (factura.tipo === 'RUBEN') {
+        return cabeceraRuben;
+      }
+      if (factura.tipo === 'INMA') {
+        return cabeceraInma;
+      }
+      if (factura.tipo === 'ANDREA') {
+        return cabeceraAndrea;
+      }
+    })();
+    console.log(cabecera)
     //Fecha
     const fecha = new Date(factura.fecha).toLocaleDateString();
     const fechaFormateada = fecha;
     //Calcular el total de la factura
     const totales = calculoTotales(factura);
-    console.log(totales);
     const htmlCompiled = paginacion(
-      { ...factura, totales, fechaFormateada },
+      { ...factura, totales, fechaFormateada, cabecera },
       10,
     );
     const browser = await puppeteer.launch({
