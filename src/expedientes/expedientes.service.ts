@@ -11,7 +11,7 @@ export class ExpedientesService {
   async getAll() {
     return await this.expedienteModel
       .find({})
-      .populate(['usuario', 'cliente', 'factura'])
+      .populate(['cliente', 'factura'])
       .populate('colaboradores.usuario');
   }
   async getByTipo() {
@@ -22,7 +22,7 @@ export class ExpedientesService {
   async getByClient(req: Request, cliente: string) {
     return await this.expedienteModel
       .find({ cliente: { $eq: cliente }, tipo: req['user']['rol'] })
-      .populate(['usuario', 'cliente', 'factura', 'colaboradores.usuario']);
+      .populate(['cliente', 'factura', 'colaboradores.usuario']);
   }
   async getById(_id) {
     return await this.expedienteModel
