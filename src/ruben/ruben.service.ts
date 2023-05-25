@@ -5,7 +5,7 @@ import { join } from 'path';
 import * as fs from 'fs/promises';
 import puppeteer from 'puppeteer';
 import Handlebars from 'handlebars';
-import { fechaLarga } from 'utils/fecha';
+import { fechaLarga } from 'src/utils/fecha';
 
 @Injectable()
 export class RubenService {

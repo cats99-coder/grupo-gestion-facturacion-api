@@ -18,7 +18,7 @@ import {
   cabeceraRuben,
   calculoTotales,
 } from './utils/facturas';
-import { fechaCorta } from 'utils/fecha';
+import { fechaCorta } from 'src/utils/fecha';
 @Injectable()
 export class FacturasService {
   constructor(
