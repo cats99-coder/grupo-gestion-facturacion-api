@@ -15,12 +15,12 @@ import { AuthGuard } from 'src/auth/auth.guard';
 export class FacturasController {
   constructor(private facturasService: FacturasService) {}
   @Get('')
-  async getAll(@Req() req: Request) {
-    return await this.facturasService.getAll(req);
+  async getAll() {
+    return await this.facturasService.getAll();
   }
   @Post('')
-  async create(@Body() factura) {
-    return await this.facturasService.create(factura);
+  async create(@Req() req: Request, @Body() factura) {
+    return await this.facturasService.create(factura, req);
   }
   @Post('porCliente')
   async getByClient(@Req() req: Request, @Body('cliente') cliente) {

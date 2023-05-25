@@ -13,7 +13,7 @@ export class Factura {
   @Prop()
   serie: number;
   @Prop()
-  tipo: 'RUBEN' | 'INMA' | 'ANDREA' | 'CRISTINA';
+  tipo: 'RUBEN' | 'INMA' | 'ANDREA';
   @Prop({ default: new Date() })
   fecha: Date;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'usuario' })

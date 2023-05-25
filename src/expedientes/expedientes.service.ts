@@ -8,16 +8,16 @@ export class ExpedientesService {
   constructor(
     @InjectModel('expediente') private expedienteModel: Model<Expediente>,
   ) {}
-  async getAll(request: Request) {
+  async getAll() {
     return await this.expedienteModel
-      .find({ tipo: request['user']['rol'] })
+      .find({})
       .populate(['usuario', 'cliente', 'factura'])
       .populate('colaboradores.usuario');
   }
-  async getByTipo(req: Request) {
+  async getByTipo() {
     return await this.expedienteModel
-      .find({ tipo: req['user']['rol'], factura: { $exists: false } })
-      .populate(['usuario', 'cliente', 'factura', 'colaboradores.usuario']);
+      .find({ factura: { $exists: false } })
+      .populate(['cliente', 'factura', 'colaboradores.usuario']);
   }
   async getByClient(req: Request, cliente: string) {
     return await this.expedienteModel
@@ -27,7 +27,7 @@ export class ExpedientesService {
   async getById(_id) {
     return await this.expedienteModel
       .findById(_id)
-      .populate(['usuario', 'cliente', 'factura', 'colaboradores.usuario']);
+      .populate(['cliente', 'factura', 'colaboradores.usuario']);
   }
   async create(req: Request, expediente) {
     const maximo = await this.expedienteModel

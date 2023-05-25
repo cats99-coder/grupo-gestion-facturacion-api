@@ -24,9 +24,9 @@ export class FacturasService {
     @InjectModel('factura') private facturaModel: Model<Factura>,
     private expedientesService: ExpedientesService,
   ) {}
-  async getAll(req: Request) {
+  async getAll() {
     return await this.facturaModel
-      .find({ tipo: req['user']['rol'] })
+      .find({})
       .populate(['usuario', 'cliente', 'expedientes']);
   }
   async getById(id) {
@@ -74,7 +74,7 @@ export class FacturasService {
       return { numero_factura, tipo, serie };
     }
   }
-  async create(factura: any) {
+  async create(factura: any, req: Request) {
     //Comprobamos que los expedientes no estén ya facturados
     //Comprobamos que todos sean del mismo tipo
     //Comprobamos que todos sean del mismo cliente
@@ -88,7 +88,9 @@ export class FacturasService {
     };
     try {
       await asyncEvery(factura.expedientes, async (idExpediente) => {
+        console.log(idExpediente);
         const expediente = await this.expedientesService.getById(idExpediente);
+        console.log(expediente)
         if (expediente.factura !== undefined && expediente.factura !== null) {
           console.log('Ya tiene Factura');
           return false;
@@ -108,11 +110,11 @@ export class FacturasService {
           tipos.push(expediente.tipo);
         }
         if (clientes.length > 1) throw new Error('Hay más de un cliente');
-        if (tipos.length > 1) throw new Error('Hay más de un tipo');
+        // if (tipos.length > 1) throw new Error('Hay más de un tipo');
       });
       if (clientes.length === 0) throw new Error('No tiene clientes');
-      if (tipos.length === 0) throw new Error('Falta algún tipo un expediente');
-      console.log(tipos);
+      if (tipos.length === 0)
+        throw new Error('Falta algún tipo en un expediente');
     } catch (err) {
       throw new HttpException(
         {
@@ -128,13 +130,14 @@ export class FacturasService {
     //----------------------------------------------------
     //Generamos el último número de factura por tipo
     const maximo = await this.maxByType({
-      tipo: tipos[0],
+      tipo: factura.tipoParaFacturar,
       serie: factura.serie,
     });
     const facturaDocument = await this.facturaModel.create({
       ...maximo,
       cliente: clientes[0],
       expedientes: factura.expedientes,
+      usuario: req['user']['_id'],
     });
     //Facturamos los expedientes
     await this.expedientesService.facturar(
@@ -200,7 +203,7 @@ export class FacturasService {
         return cabeceraAndrea;
       }
     })();
-    console.log(cabecera)
+    console.log(cabecera);
     //Fecha
     const fecha = new Date(factura.fecha).toLocaleDateString();
     const fechaFormateada = fecha;

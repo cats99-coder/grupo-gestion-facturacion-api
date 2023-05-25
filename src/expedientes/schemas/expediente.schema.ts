@@ -52,8 +52,6 @@ export class Expediente {
   numero_expediente: number;
   @Prop({ default: new Date() })
   fecha: Date;
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'usuario' })
-  usuario: Usuario;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'cliente' })
   cliente: Cliente;
   @Prop()

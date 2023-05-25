@@ -19,7 +19,7 @@ class Contacto {
 
 const ContactoSchema = SchemaFactory.createForClass(Contacto);
 
-@Schema()
+@Schema({ toJSON: { virtuals: true } })
 export class Cliente {
   @Prop({ required: true, unique: true })
   NIF: string;
@@ -54,3 +54,10 @@ export class Cliente {
 }
 
 export const ClienteSchema = SchemaFactory.createForClass(Cliente);
+ClienteSchema.virtual('nombreCompleto').get(function () {
+  if (this.tipo === 'EMPRESA') {
+    return this.razon_social;
+  } else {
+    return `${this.nombre} ${this.apellido1} ${this.apellido2}`;
+  }
+});

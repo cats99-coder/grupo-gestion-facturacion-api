@@ -15,8 +15,8 @@ import { AuthGuard } from 'src/auth/auth.guard';
 export class ExpedientesController {
   constructor(private expedientesService: ExpedientesService) {}
   @Get('')
-  async getAll(@Req() req: Request) {
-    return await this.expedientesService.getAll(req);
+  async getAll() {
+    return await this.expedientesService.getAll();
   }
   @Get(':id')
   async getByid(@Param('id') id) {
@@ -27,8 +27,8 @@ export class ExpedientesController {
     return await this.expedientesService.create(req, expediente);
   }
   @Post('porFacturar')
-  async getByTipo(@Req() req: Request) {
-    return await this.expedientesService.getByTipo(req);
+  async getByTipo() {
+    return await this.expedientesService.getByTipo();
   }
   @Post('porCliente')
   async getByClient(@Req() req: Request, @Body('cliente') cliente) {
