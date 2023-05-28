@@ -3,10 +3,6 @@ import { UsuariosService } from './usuarios.service';
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private usuarioService: UsuariosService) {}
-  @Get('install')
-  async install() {
-    return await this.usuarioService.install();
-  }
   @Get('')
   async getAll() {
     return await this.usuarioService.getAll();

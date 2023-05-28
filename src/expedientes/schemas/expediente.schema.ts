@@ -1,6 +1,6 @@
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Usuario, UsuarioSchema } from 'src/usuarios/schemas/usuarios.schema';
+import { Usuario } from 'src/usuarios/schemas/usuarios.schema';
 import { Cliente } from 'src/clientes/schemas/clientes.schema';
 import { Factura } from 'src/facturas/schemas/factura.schema';
 
@@ -27,11 +27,23 @@ class Estado {
 const EstadoSchema = SchemaFactory.createForClass(Estado);
 
 @Schema()
+class Pago {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'usuario' })
+  usuario: Usuario;
+  @Prop({ default: 0 })
+  importe: number;
+}
+
+export const PagoSchema = SchemaFactory.createForClass(Pago);
+
+@Schema()
 class Colaborador {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'usuario' })
   usuario: Usuario;
   @Prop({ default: 0 })
   importe: number;
+  @Prop({ type: [PagoSchema] })
+  pagos: Pago[];
 }
 
 const ColaboradorSchema = SchemaFactory.createForClass(Colaborador);
@@ -39,14 +51,14 @@ const ColaboradorSchema = SchemaFactory.createForClass(Colaborador);
 @Schema()
 class Cobro {
   @Prop()
-  tipo: "BIZUM C" | "EFECTIVO R"
+  tipo: 'BIZUM C' | 'EFECTIVO R';
   @Prop({ default: 0 })
   importe: number;
 }
 
 const CobroSchema = SchemaFactory.createForClass(Cobro);
 
-@Schema()
+@Schema({})
 export class Expediente {
   @Prop({ required: true })
   numero_expediente: number;

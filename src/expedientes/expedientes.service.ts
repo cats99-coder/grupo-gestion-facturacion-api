@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Expediente, ExpedienteDocument } from './schemas/expediente.schema';
+import { Usuario } from 'src/usuarios/schemas/usuarios.schema';
+import { Deuda, Deudor } from './schemas/Types';
 
 @Injectable()
 export class ExpedientesService {
@@ -11,18 +13,21 @@ export class ExpedientesService {
   async getAll() {
     return await this.expedienteModel
       .find({})
+      .sort({ numero_expediente: -1 })
       .populate(['cliente', 'factura'])
       .populate('colaboradores.usuario');
   }
   async getByTipo() {
     return await this.expedienteModel
       .find({ factura: { $exists: false } })
-      .populate(['cliente', 'factura', 'colaboradores.usuario']);
+      .populate(['cliente', 'factura', 'colaboradores.usuario'])
+      .sort({ numero_expediente: -1 });
   }
   async getByClient(req: Request, cliente: string) {
     return await this.expedienteModel
       .find({ cliente: { $eq: cliente }, tipo: req['user']['rol'] })
-      .populate(['cliente', 'factura', 'colaboradores.usuario']);
+      .populate(['cliente', 'factura', 'colaboradores.usuario'])
+      .sort({ numero_expediente: -1 });
   }
   async getById(_id) {
     return await this.expedienteModel
@@ -54,14 +59,70 @@ export class ExpedientesService {
     });
     return true;
   }
-  async getColaboraciones(usuario: string) {
-    const expedientes = await this.expedienteModel.find({
-      'colaboradores.colaborador': {
-        $elemMatch: {
-          importe: 120,
+  async getExpedientesColaboraciones(usuario: string) {
+    const expedientes = await this.expedienteModel
+      .find(
+        {
+          colaboradores: {
+            $elemMatch: {
+              usuario: new mongoose.Types.ObjectId(usuario),
+            },
+          },
         },
-      },
+        {},
+        {},
+      )
+      .exec();
+    return expedientes.map((expediente) => {
+      return expediente.toObject();
     });
-    return expedientes;
+  }
+  async getColaboraciones(usuario: string) {
+    //Buscamos los expedientes en lo que aparece en colaboraciones
+    const expedientesConColaboraciones =
+      await this.getExpedientesColaboraciones(usuario);
+    const deudores = expedientesConColaboraciones.reduce(
+      (prev: Deudor[], current) => {
+        const usuarioIndex = prev.findIndex((value) => {
+          return value.tipo === current.tipo;
+        });
+        if (usuarioIndex !== -1) {
+          prev[usuarioIndex].deudas.push(
+            ...current.colaboradores
+              .filter((value) => {
+                return (value.usuario as any).equals(usuario);
+              })
+              .map((value) => {
+                return {
+                  expediente: current.numero_expediente,
+                  importe: value.importe,
+                  pagos: value.pagos,
+                  usuario: value.usuario,
+                };
+              }),
+          );
+          return prev;
+        } else {
+          const colaboraciones: Deuda[] = current.colaboradores
+            .filter((value) => {
+              return (value.usuario as any).equals(usuario);
+            })
+            .map((value) => {
+              return {
+                expediente: current.numero_expediente,
+                importe: value.importe,
+                pagos: value.pagos,
+              };
+            });
+          prev.push({
+            tipo: current.tipo,
+            deudas: colaboraciones,
+          });
+          return prev;
+        }
+      },
+      [],
+    );
+    return deudores;
   }
 }

@@ -1,11 +1,12 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   StreamableFile,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Factura } from './schemas/factura.schema';
 import { ExpedientesService } from 'src/expedientes/expedientes.service';
 import { join } from 'path';
@@ -19,6 +20,8 @@ import {
   calculoTotales,
 } from './utils/facturas';
 import { fechaCorta } from 'src/utils/fecha';
+import { Workbook } from 'exceljs';
+import * as tmp from 'tmp';
 @Injectable()
 export class FacturasService {
   constructor(
@@ -40,41 +43,23 @@ export class FacturasService {
       .find({ cliente: { $eq: cliente }, tipo: req['user']['rol'] })
       .populate(['usuario', 'cliente']);
   }
-  async maxByType({ tipo, serie }: { tipo: string; serie?: string }) {
-    //Tipo Abogacía
-    if (tipo === 'INMA') {
-      const maximo = await this.facturaModel
-        .find({ tipo: 'INMA' })
-        .sort({ numero_factura: -1 })
-        .limit(1)
-        .exec();
-      const numero_factura =
-        maximo.length === 0 ? 1 : maximo[0].numero_factura + 1;
-      return { numero_factura, tipo };
-    }
-    //Tipo Gestoria
-    if (tipo === 'ANDREA') {
-      const maximo = await this.facturaModel
-        .find({ tipo: 'ANDREA' })
-        .sort({ numero_factura: -1 })
-        .limit(1)
-        .exec();
-      const numero_factura =
-        maximo.length === 0 ? 1 : maximo[0].numero_factura + 1;
-      return { numero_factura, tipo };
-    }
-    //Tipo Fiscal
-    if (tipo === 'RUBEN') {
-      const maximo = await this.facturaModel
-        .find({ tipo: 'RUBEN', serie })
-        .sort({ numero_factura: -1 })
-        .limit(1)
-        .exec();
-      const numero_factura =
-        maximo.length === 0 ? 1 : maximo[0].numero_factura + 1;
-      return { numero_factura, tipo, serie };
-    }
+  getFirst(tipo: string, serie: string): number {
+    const serieNum = parseInt(serie);
+    if (serieNum !== 23) return 1;
+    if (tipo === 'ANDREA') return 72;
+    return 1;
   }
+  async maxByType({ tipo, serie }: { tipo: string; serie?: string }) {
+    const maximo = await this.facturaModel
+      .find({ tipo, serie })
+      .sort({ numero_factura: -1 })
+      .limit(1)
+      .exec();
+    const numero =
+      maximo.length === 0 ? this.getFirst(tipo, serie) : maximo[0].numero + 1;
+    return { numero, tipo, serie };
+  }
+
   async create(factura: any, req: Request) {
     //Comprobamos que los expedientes no estén ya facturados
     //Comprobamos que todos sean del mismo tipo
@@ -89,7 +74,6 @@ export class FacturasService {
     };
     try {
       await asyncEvery(factura.expedientes, async (idExpediente) => {
-        console.log(idExpediente);
         const expediente = await this.expedientesService.getById(idExpediente);
         console.log(expediente);
         if (expediente.factura !== undefined && expediente.factura !== null) {
@@ -134,12 +118,22 @@ export class FacturasService {
       tipo: factura.tipoParaFacturar,
       serie: factura.serie,
     });
+    console.log(maximo);
+    const fecha = new Date();
+    fecha.setMilliseconds(0);
+    fecha.setSeconds(0);
+    fecha.setMinutes(0);
+    fecha.setHours(0);
+    console.log(req['user']);
     const facturaDocument = await this.facturaModel.create({
       ...maximo,
       cliente: clientes[0],
+      fecha,
       expedientes: factura.expedientes,
       usuario: req['user']['_id'],
     });
+    console.log(facturaDocument);
+    console.log(clientes[0], factura.expedientes, req['user']['_id']);
     //Facturamos los expedientes
     await this.expedientesService.facturar(
       factura.expedientes,
@@ -225,6 +219,61 @@ export class FacturasService {
       format: 'A4',
     });
     await browser.close();
+    console.log(pdf);
     return new StreamableFile(pdf);
+  }
+  async generateExcel(facturasSeleccionadas: [string]) {
+    //Buscamos las facturas
+    const idFacturas = facturasSeleccionadas.map((factura) => {
+      return new mongoose.Types.ObjectId(factura);
+    });
+    const facturas = await this.facturaModel
+      .find({ _id: idFacturas })
+      .populate(['cliente', 'expedientes'])
+      .exec();
+    console.log(facturas);
+    //Creamos el libro de excel
+    const excel = new Workbook();
+    const sheet = excel.addWorksheet('Facturas');
+    sheet.columns = [
+      { header: 'Fecha Factura', key: 'fecha', width: 20 },
+      { header: 'Número Factura', key: 'numero_factura', width: 20 },
+      { header: 'NIF', key: 'cliente.NIF', width: 20 },
+      { header: 'Nombre', key: 'cliente.nombreCompleto', width: 20 },
+      { header: 'Concepto', key: 'concepto', width: 30 },
+      { header: 'Base IVA', key: 'base', width: 15 },
+    ];
+    //Introducimos los datos
+    sheet.addRows([
+      ...facturas.map((factura) => {
+        const fecha = new Date(factura.fecha);
+        fecha.setDate(32);
+        return { ...factura, fecha };
+      }),
+    ]);
+
+    //Guardamos el archivo temporal
+    let File = await new Promise((resolve, reject) => {
+      tmp.file(
+        {
+          discardDescriptor: true,
+          prefix: 'facturacion',
+          postfix: '.xlsx',
+          mode: parseInt('0600', 8),
+        },
+        async (err, file) => {
+          if (err) throw new BadRequestException(err);
+          excel.xlsx
+            .writeFile(file)
+            .then(() => {
+              resolve(file);
+            })
+            .catch((err) => {
+              throw new BadRequestException(err);
+            });
+        },
+      );
+    });
+    return File;
   }
 }

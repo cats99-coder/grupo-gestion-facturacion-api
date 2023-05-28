@@ -25,39 +25,5 @@ export class UsuariosService {
       new: true,
     });
   }
-  async install() {
-    const usuarios = await this.usuariosModel.find({});
-    if (usuarios.length === 0) {
-      await this.usuariosModel.create([
-        {
-          email: 'ruben@gmail.com',
-          nombre: 'Rubén',
-          password: '1234',
-          rol: 'RUBEN',
-          usuario: 'ruben',
-        },
-        {
-          email: 'inma@gmail.com',
-          nombre: 'Inma',
-          password: '1234',
-          rol: 'INMA',
-          usuario: 'inma',
-        },
-        {
-          email: 'andrea@gmail.com',
-          nombre: 'Andrea',
-          password: '1234',
-          rol: 'ANDREA',
-          usuario: 'andrea',
-        },
-        {
-          email: 'cristina@gmail.com',
-          nombre: 'Cristina',
-          password: '1234',
-          rol: 'CRISTINA',
-          usuario: 'cristina',
-        },
-      ]);
-    }
-  }
+    
 }

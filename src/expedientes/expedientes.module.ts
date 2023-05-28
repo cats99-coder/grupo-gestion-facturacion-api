@@ -12,6 +12,11 @@ import { ExpedienteSchema } from './schemas/expediente.schema';
   ],
   controllers: [ExpedientesController],
   providers: [ExpedientesService],
-  exports: [ExpedientesService],
+  exports: [
+    ExpedientesService,
+    MongooseModule.forFeature([
+      { name: 'expediente', schema: ExpedienteSchema },
+    ]),
+  ],
 })
 export class ExpedientesModule {}

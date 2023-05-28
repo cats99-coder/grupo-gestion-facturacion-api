@@ -21,7 +21,7 @@ const ContactoSchema = SchemaFactory.createForClass(Contacto);
 
 @Schema({ toJSON: { virtuals: true }, toObject: { virtuals: true } })
 export class Cliente {
-  @Prop({ required: true, unique: true })
+  @Prop({ unique: true, sparse: true })
   NIF: string;
   @Prop({ default: 'PERSONA' })
   tipo: 'EMPRESA' | 'PERSONA';

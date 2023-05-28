@@ -10,6 +10,9 @@ import { ClientesService } from './clientes.service';
   ],
   controllers: [ClientesController],
   providers: [ClientesService],
-  exports: [ClientesService],
+  exports: [
+    ClientesService,
+    MongooseModule.forFeature([{ name: 'cliente', schema: ClienteSchema }]),
+  ],
 })
 export class ClientesModule {}

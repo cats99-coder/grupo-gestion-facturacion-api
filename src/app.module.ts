@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientesModule } from './clientes/clientes.module';
@@ -16,7 +16,7 @@ import { ColaboradoresModule } from './colaboradores/colaboradores.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: './env/.env'
+      envFilePath: './env/.env',
     }),
     ClientesModule,
     MongooseModule.forRoot(
