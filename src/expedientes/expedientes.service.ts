@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Expediente, ExpedienteDocument } from './schemas/expediente.schema';
@@ -47,6 +47,25 @@ export class ExpedientesService {
       ...expediente,
       tipo: req['user']['rol'],
     });
+  }
+  async delete(id) {
+    try {
+      //Comprobamos que no esté facturado
+      const expediente = await this.expedienteModel.findById(id).exec();
+      if (expediente.factura) throw new BadRequestException();
+      return await this.expedienteModel.findByIdAndDelete(id);
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.EXPECTATION_FAILED,
+          error: err,
+        },
+        HttpStatus.EXPECTATION_FAILED,
+        {
+          cause: err,
+        },
+      );
+    }
   }
   async update(id, expediente) {
     return await this.expedienteModel.findByIdAndUpdate(id, expediente, {

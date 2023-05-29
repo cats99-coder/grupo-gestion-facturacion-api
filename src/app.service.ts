@@ -52,7 +52,7 @@ export class AppService {
       ]);
     }
     usuarios = await this.usuariosModel.find({});
-    const filePath = join(process.cwd(), '/excel/EXPEDIENTES.xlsm');
+    const filePath = join(process.cwd(), '/excel/EXPEDIENTES.xlsx');
     const file = await fs.readFile(filePath);
     const workbook = new Workbook();
     await workbook.xlsx.load(file);
@@ -62,18 +62,40 @@ export class AppService {
     ws.eachRow(function (row, rowNumber) {
       if (rowNumber === 1) return;
       excel.push({
+        numero_expediente: row.values[1],
         cliente: row.values[2],
-        fecha: row.values[3],
-        realiza: row.values[4],
-        concepto: row.values[5],
-        importe: row.values[9],
-        IVA: row.values[10],
-        suplidos: row.values[12],
-        colaboradores: row.values[13],
-        cobros: { importe: row.values[15], concepto: row.values[18] },
-        pagoColaborador: row.values[18],
+        clienteTipo: row.values[3],
+        fecha: row.values[4],
+        realiza: row.values[5],
+        concepto: row.values[6],
+        importe: row.values[10],
+        IVA: row.values[11],
+        suplidos: row.values[13],
+        colaboradores: row.values[14],
+        cobros: { importe: row.values[16], concepto: row.values[19] },
+        pagoColaborador: row.values[19],
       });
     });
+    //Preparamos las fechas de los expedientes
+    excel = excel.map((e) => {
+      const fecha = new Date(e.fecha);
+      const antigua = fecha.getTime();
+      fecha.setTime(antigua - 60 * 60 * 2 * 1000);
+      return { ...e, fecha };
+    });
+    //Preparamos los números de expediente
+    excel = excel.map((e) => {
+      const id = e.numero_expediente;
+      const fecha = new Date(e.fecha).getTime();
+      const fechaFin = new Date('01-01-2019').getTime();
+      if (fecha > fechaFin) {
+        const pre = new Date(fecha).getFullYear() - 2000;
+        const numero_expediente = pre * 10000 + parseInt(id);
+        return { ...e, numero_expediente };
+      }
+      return { ...e, numero_expediente: id };
+    });
+
     //Preparamos los nombres de los clientes
     let clientesId = [];
     excel = excel.map((e) => {
@@ -84,6 +106,8 @@ export class AppService {
       let nombre = '';
       let apellido1 = '';
       let apellido2 = '';
+      let tipo = e.clienteTipo;
+      let razon_social = '';
       if (nombreSeparado.length === 3) {
         nombre = nombreSeparado[0];
         apellido1 = nombreSeparado[1];
@@ -92,6 +116,9 @@ export class AppService {
       if (nombreSeparado.length === 2) {
         nombre = nombreSeparado[0];
         apellido1 = nombreSeparado[1];
+      }
+      if (nombreSeparado.length === 1) {
+        nombre = nombreSeparado[0];
       }
       if (nombreSeparado.length === 4) {
         nombre = nombreSeparado[0] + ' ' + nombreSeparado[1];
@@ -119,14 +146,31 @@ export class AppService {
         apellido1 = 'FERNANDEZ';
         apellido2 = 'GOMEZ';
       }
-
-      if (!clienteId) {
+      if (!clienteId && tipo === 'PERSONA') {
         clientesId.push({
           clienteExcel: e.cliente,
           nombre,
           apellido1,
           apellido2,
+          tipo,
         });
+      }
+
+      if (!clienteId && tipo === 'EMPRESA') {
+        razon_social = e.cliente;
+        clientesId.push({
+          clienteExcel: e.cliente,
+          razon_social,
+          tipo,
+        });
+      }
+      if (tipo === 'EMPRESA') {
+        razon_social = e.cliente;
+        return {
+          ...e,
+          cliente: { razon_social },
+          clienteExcel: e.cliente,
+        };
       }
       return {
         ...e,
@@ -139,9 +183,7 @@ export class AppService {
       clientesId.map(async (clienteId) => {
         console.log(clienteId);
         const cliente = await this.clientesModel.create({
-          nombre: clienteId.nombre,
-          apellido1: clienteId.apellido1,
-          apellido2: clienteId.apellido2,
+          ...clienteId,
         });
         return { ...clienteId, _id: cliente._id };
       }),
@@ -211,24 +253,8 @@ export class AppService {
     //Creamos los expedientes
     excel = await Promise.all(
       excel.map(async (e, index) => {
-        const maximo = await this.expedientesModel
-          .find()
-          .sort({ numero_expediente: -1 })
-          .limit(1)
-          .exec();
-        let numero_expediente = 230000 + index + 1;
-        if (index >= 12) {
-          numero_expediente += 2;
-        }
-        if (index >= 18) {
-          numero_expediente += 1;
-        }
-        if (index >= 132) {
-          numero_expediente += 1;
-        }
         return await this.expedientesModel.create({
           ...e,
-          numero_expediente,
         });
       }),
     );

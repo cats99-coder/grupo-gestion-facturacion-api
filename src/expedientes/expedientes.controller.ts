@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
   Param,
   UseGuards,
@@ -41,5 +42,9 @@ export class ExpedientesController {
   @Post(':id')
   async update(@Body() expediente, @Param('id') id) {
     return await this.expedientesService.update(id, expediente);
+  }
+  @Delete(':id')  
+  async delete(@Param('id') id) {
+    return await this.expedientesService.delete(id);
   }
 }
