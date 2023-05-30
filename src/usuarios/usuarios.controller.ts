@@ -29,7 +29,7 @@ export class UsuariosController {
   @Post('changePassword')
   async changePassword(
     @Req() req: Request,
-    @Body('newPassword') newPassword,
+    @Body('oldPassword') oldPassword,
     @Body('newPassword') newPassword,
   ) {
     return await this.usuarioService.changePassword(
