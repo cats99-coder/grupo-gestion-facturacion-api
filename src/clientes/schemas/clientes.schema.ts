@@ -40,6 +40,8 @@ export class Cliente {
   @Prop()
   numero_cuenta: string;
   @Prop()
+  calle: string;
+  @Prop()
   codigo_postal: string;
   @Prop()
   localidad: string;
