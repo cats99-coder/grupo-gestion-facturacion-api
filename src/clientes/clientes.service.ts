@@ -7,7 +7,7 @@ import { Model } from 'mongoose';
 export class ClientesService {
   constructor(@InjectModel('cliente') private clientesModel: Model<Cliente>) {}
   async getAll() {
-    return await this.clientesModel.find().sort({apellido1: 1, apellido2: 1, nombre: 1});
+    return await this.clientesModel.find().sort({razon_social: 1, apellido1: 1, apellido2: 1, nombre: 1});
   }
   async getById(id) {
     return await this.clientesModel.findById(id);

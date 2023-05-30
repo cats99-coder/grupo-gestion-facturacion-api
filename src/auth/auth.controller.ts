@@ -3,10 +3,12 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  UseGuards,
   Post,
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -23,5 +25,10 @@ export class AuthController {
       signInDto.password,
     );
     return token;
+  }
+  @UseGuards(AuthGuard)
+  @Post('verify')
+  async verify() {
+    return true;
   }
 }
