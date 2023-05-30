@@ -1,5 +1,16 @@
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
+import { AuthGuard } from 'src/auth/auth.guard';
+
+@UseGuards(AuthGuard)
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private usuarioService: UsuariosService) {}
@@ -14,6 +25,18 @@ export class UsuariosController {
   @Post('')
   async create(@Body() usuario) {
     return await this.usuarioService.create(usuario);
+  }
+  @Post('changePassword')
+  async changePassword(
+    @Req() req: Request,
+    @Body('newPassword') newPassword,
+    @Body('newPassword') newPassword,
+  ) {
+    return await this.usuarioService.changePassword(
+      req,
+      oldPassword,
+      newPassword,
+    );
   }
   @Post(':id')
   async update(@Body() usuario, @Param('id') id) {

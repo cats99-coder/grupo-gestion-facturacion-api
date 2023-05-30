@@ -11,7 +11,7 @@ export class Usuario {
   usuario: string;
   @Prop()
   email: string;
-  @Prop({ required: true, select: 0 })
+  @Prop({ required: true, select: 1 })
   password: string;
   @Prop({ default: true })
   changePassword: boolean;
