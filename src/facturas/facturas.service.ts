@@ -40,7 +40,7 @@ export class FacturasService {
   }
   async getByClient(req: Request, cliente: string) {
     return await this.facturaModel
-      .find({ cliente: { $eq: cliente }, tipo: req['user']['rol'] })
+      .find({ cliente: { $eq: cliente } })
       .populate(['usuario', 'cliente']);
   }
   getFirst(tipo: string, serie: string): number {

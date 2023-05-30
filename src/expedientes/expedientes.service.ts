@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Expediente, ExpedienteDocument } from './schemas/expediente.schema';
@@ -25,7 +30,7 @@ export class ExpedientesService {
   }
   async getByClient(req: Request, cliente: string) {
     return await this.expedienteModel
-      .find({ cliente: { $eq: cliente }, tipo: req['user']['rol'] })
+      .find({ cliente: { $eq: cliente } })
       .populate(['cliente', 'factura', 'colaboradores.usuario'])
       .sort({ numero_expediente: -1 });
   }
