@@ -52,7 +52,7 @@ export class FacturasService {
   async maxByType({ tipo, serie }: { tipo: string; serie?: string }) {
     const maximo = await this.facturaModel
       .find({ tipo, serie })
-      .sort({ numero_factura: -1 })
+      .sort({ numero: -1 })
       .limit(1)
       .exec();
     const numero =
