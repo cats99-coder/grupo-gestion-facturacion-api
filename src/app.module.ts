@@ -21,6 +21,9 @@ import { ColaboradoresModule } from './colaboradores/colaboradores.module';
     ClientesModule,
     MongooseModule.forRoot(
       `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/grupo-gestion`,
+      {
+        autoIndex: true
+      }
     ),
     UsuariosModule,
     ExpedientesModule,

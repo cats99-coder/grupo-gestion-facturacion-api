@@ -60,7 +60,7 @@ const CobroSchema = SchemaFactory.createForClass(Cobro);
 
 @Schema({})
 export class Expediente {
-  @Prop({ required: true, unique: true })
+  @Prop({ type: Number, required: true, unique: true, index: true })
   numero_expediente: number;
   @Prop({ default: new Date() })
   fecha: Date;

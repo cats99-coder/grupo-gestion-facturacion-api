@@ -22,30 +22,30 @@ export class AppService {
     if (usuarios.length === 0) {
       await this.usuariosModel.create([
         {
-          email: 'ruben@gmail.com',
+          email: '',
           nombre: 'Rubén',
-          password: '1234',
+          password: '7x!yxWtA',
           rol: 'RUBEN',
           usuario: 'ruben',
         },
         {
-          email: 'inma@gmail.com',
+          email: '',
           nombre: 'Inma',
-          password: '1234',
+          password: '&4K9t%Go',
           rol: 'INMA',
           usuario: 'inma',
         },
         {
-          email: 'andrea@gmail.com',
+          email: '',
           nombre: 'Andrea',
-          password: '1234',
+          password: 'HtM!jT8e',
           rol: 'ANDREA',
           usuario: 'andrea',
         },
         {
-          email: 'cristina@gmail.com',
+          email: '',
           nombre: 'Cristina',
-          password: '1234',
+          password: '52kKnR@a',
           rol: 'CRISTINA',
           usuario: 'cristina',
         },
@@ -75,6 +75,18 @@ export class AppService {
         cobros: { importe: row.values[16], concepto: row.values[19] },
         pagoColaborador: row.values[19],
       });
+    });
+
+    //Preparamos el IVA
+    excel = excel.map((e) => {
+      const importe = e.importe || 0;
+      const colaboradores = e.colaboradores || 0;
+      if (e.IVA) {
+        const IVA = (e.IVA * 100) / (importe + colaboradores);
+        return { ...e, IVA };
+      }
+
+      return e;
     });
     //Preparamos las fechas de los expedientes
     excel = excel.map((e) => {
@@ -181,7 +193,6 @@ export class AppService {
     //Creamos los clientes y cargamos su id
     clientesId = await Promise.all(
       clientesId.map(async (clienteId) => {
-        console.log(clienteId);
         const cliente = await this.clientesModel.create({
           ...clienteId,
         });
@@ -216,6 +227,7 @@ export class AppService {
 
     //Preparamos los tipos y colaboradores
     excel = excel.map((e) => {
+      console.log(e.numero_expediente)
       if ((e.realiza as string).includes('/')) {
         const [tipo, colaborador] = e.realiza.split('/');
         const usuario = usuarios.find((usuario) => {
