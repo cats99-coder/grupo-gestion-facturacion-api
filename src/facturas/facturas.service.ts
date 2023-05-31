@@ -22,11 +22,13 @@ import {
 import { fechaCorta } from 'src/utils/fecha';
 import { Workbook } from 'exceljs';
 import * as tmp from 'tmp';
+import { ClientesService } from 'src/clientes/clientes.service';
 @Injectable()
 export class FacturasService {
   constructor(
     @InjectModel('factura') private facturaModel: Model<Factura>,
     private expedientesService: ExpedientesService,
+    private clientesService: ClientesService,
   ) {}
   async getAll() {
     return await this.facturaModel
@@ -75,7 +77,6 @@ export class FacturasService {
     try {
       await asyncEvery(factura.expedientes, async (idExpediente) => {
         const expediente = await this.expedientesService.getById(idExpediente);
-        console.log(expediente);
         if (expediente.factura !== undefined && expediente.factura !== null) {
           console.log('Ya tiene Factura');
           return false;
@@ -118,17 +119,21 @@ export class FacturasService {
       tipo: factura.tipoParaFacturar,
       serie: factura.serie,
     });
-    console.log(maximo);
     const fecha = new Date();
     fecha.setMilliseconds(0);
     fecha.setSeconds(0);
     fecha.setMinutes(0);
     fecha.setHours(0);
-    console.log(req['user']);
+    const cliente = this.clientesService.getById(clientes[0]);
     const facturaDocument = await this.facturaModel.create({
       ...maximo,
       cliente: clientes[0],
       fecha,
+      retencion: (
+        await cliente
+      ).retencion
+        ? +process.env.CONFIGURACION_RETENCION
+        : 0,
       expedientes: factura.expedientes,
       usuario: req['user']['_id'],
     });
@@ -219,7 +224,6 @@ export class FacturasService {
       format: 'A4',
     });
     await browser.close();
-    console.log(pdf);
     return new StreamableFile(pdf);
   }
   async generateExcel(facturasSeleccionadas: [string]) {

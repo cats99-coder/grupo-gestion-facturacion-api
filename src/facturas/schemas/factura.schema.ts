@@ -17,6 +17,8 @@ export class Factura {
   tipo: 'RUBEN' | 'INMA' | 'ANDREA';
   @Prop({ default: new Date() })
   fecha: Date;
+  @Prop({type: Number, required: true})
+  retencion: number;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'usuario' })
   usuario: Usuario;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'cliente' })
@@ -28,7 +30,7 @@ export class Factura {
 export const FacturaSchema = SchemaFactory.createForClass(Factura);
 
 FacturaSchema.virtual('numero_factura').get(function () {
-  if (this.tipo === 'RUBEN') {
+  if (this.tipo === 'RUBEN' || this.tipo === 'INMA') {
     return `EXPT${this.serie}${zfill(this.numero, 4)}`;
   }
   return `${this.serie}${zfill(this.numero, 4)}`

@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { RubenModule } from './ruben/ruben.module';
 import { ColaboradoresModule } from './colaboradores/colaboradores.module';
+import { ConfiguracionModule } from './configuracion/configuracion.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ColaboradoresModule } from './colaboradores/colaboradores.module';
     AuthModule,
     RubenModule,
     ColaboradoresModule,
+    ConfiguracionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
