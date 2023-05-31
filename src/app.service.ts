@@ -114,6 +114,7 @@ export class AppService {
       const clienteId = clientesId.find((clienteId) => {
         return clienteId.clienteExcel === e.cliente;
       });
+      console.log(e.numero_expediente)
       const nombreSeparado: Array<string> = e.cliente.split(' ');
       let nombre = '';
       let apellido1 = '';
