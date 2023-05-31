@@ -8,7 +8,7 @@ export class ConfiguracionService {
     const env = await fs.readFile(join(process.cwd(), 'env', '.env'), 'utf-8');
     console.log(env);
     const config = env.split('\n');
-    console.log(config)
+    console.log(config);
     const configMap = config
       .filter((c) => {
         return c.startsWith('CONFIGURACION_');
@@ -61,5 +61,6 @@ export class ConfiguracionService {
       }
     });
     await fs.writeFile(join(process.cwd(), 'env', '.env'), res.join('\r\n'));
+    return true;
   }
 }
