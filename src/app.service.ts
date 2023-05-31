@@ -236,14 +236,14 @@ export class AppService {
         if (e.realiza === 'INMA/RUBEN') {
           return {
             ...e,
-            importe: Number(e.importe) / 2,
+            importe: Number(e.importe || 0) / 2,
             tipo,
             colaboradores: [
               {
                 usuario: usuario._id,
                 importe: e.importe / 2,
                 pagos: [
-                  { usuario: usuario._id, importe: Number(e.importe) / 2 },
+                  { usuario: usuario._id, importe: Number(e.importe || 0) / 2 },
                 ],
               },
             ],
