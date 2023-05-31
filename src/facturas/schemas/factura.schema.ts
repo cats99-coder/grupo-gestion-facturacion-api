@@ -13,11 +13,11 @@ export class Factura {
   serie: number;
   @Prop()
   numero: number;
-  @Prop()
+  @Prop({required: true, enum: ['RUBEN', 'INMA', 'ANDREA'] })
   tipo: 'RUBEN' | 'INMA' | 'ANDREA';
   @Prop({ default: new Date() })
   fecha: Date;
-  @Prop({type: Number, required: true})
+  @Prop({ type: Number, required: true })
   retencion: number;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'usuario' })
   usuario: Usuario;
@@ -33,5 +33,5 @@ FacturaSchema.virtual('numero_factura').get(function () {
   if (this.tipo === 'RUBEN' || this.tipo === 'INMA') {
     return `EXPT${this.serie}${zfill(this.numero, 4)}`;
   }
-  return `${this.serie}${zfill(this.numero, 4)}`
+  return `${this.serie}${zfill(this.numero, 4)}`;
 });

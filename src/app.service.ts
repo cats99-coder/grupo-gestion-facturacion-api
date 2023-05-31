@@ -227,12 +227,28 @@ export class AppService {
 
     //Preparamos los tipos y colaboradores
     excel = excel.map((e) => {
-      console.log(e.numero_expediente)
+      console.log(e.numero_expediente);
       if ((e.realiza as string).includes('/')) {
         const [tipo, colaborador] = e.realiza.split('/');
         const usuario = usuarios.find((usuario) => {
           return usuario.rol === colaborador;
         });
+        if (e.realiza === 'INMA/RUBEN') {
+          return {
+            ...e,
+            importe: Number(e.importe) / 2,
+            tipo,
+            colaboradores: [
+              {
+                usuario: usuario._id,
+                importe: e.importe / 2,
+                pagos: [
+                  { usuario: usuario._id, importe: Number(e.importe) / 2 },
+                ],
+              },
+            ],
+          };
+        }
         if (e.pagoColaborador) {
           return {
             ...e,
