@@ -227,7 +227,6 @@ export class AppService {
 
     //Preparamos los tipos y colaboradores
     excel = excel.map((e) => {
-      console.log(e.numero_expediente);
       if ((e.realiza as string).includes('/')) {
         const [tipo, colaborador] = e.realiza.split('/');
         const usuario = usuarios.find((usuario) => {
@@ -241,7 +240,7 @@ export class AppService {
             colaboradores: [
               {
                 usuario: usuario._id,
-                importe: e.importe / 2,
+                importe: Number(e.importe || 0) / 2,
                 pagos: [
                   { usuario: usuario._id, importe: Number(e.importe || 0) / 2 },
                 ],
@@ -281,6 +280,11 @@ export class AppService {
     //Creamos los expedientes
     excel = await Promise.all(
       excel.map(async (e, index) => {
+        if (e.colaboradores.length !== 0) {
+          if (Number.isNaN(e.colaboradores[0].importe)) {
+            console.log(e);
+          }
+        }
         return await this.expedientesModel.create({
           ...e,
         });
