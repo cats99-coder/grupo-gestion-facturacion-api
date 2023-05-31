@@ -4,6 +4,7 @@ import { join } from 'path';
 @Injectable()
 export class ConfiguracionService {
   async getconfig() {
+    console.log(process.cwd());
     const env = await fs.readFile(join(process.cwd(), 'env', '.env'), 'utf-8');
     const config = env.split('\r\n');
     const configMap = config
