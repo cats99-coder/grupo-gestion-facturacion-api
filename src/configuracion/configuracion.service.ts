@@ -27,6 +27,7 @@ export class ConfiguracionService {
   }
   async update(newConfig: Object) {
     const env = await fs.readFile(join(process.cwd(), 'env', '.env'), 'utf-8');
+    console.log(env);
     let config = env.split('\r');
     const configMap = config
       .filter((c) => {
