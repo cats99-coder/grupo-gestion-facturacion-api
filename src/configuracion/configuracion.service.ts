@@ -18,6 +18,7 @@ export class ConfiguracionService {
           [sub]: value,
         };
       }, {});
+    console.log(configMap);
     return configMap;
   }
   async update(newConfig: Object) {
