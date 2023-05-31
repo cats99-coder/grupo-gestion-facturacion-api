@@ -28,7 +28,7 @@ export class ConfiguracionService {
   async update(newConfig: Object) {
     const env = await fs.readFile(join(process.cwd(), 'env', '.env'), 'utf-8');
     console.log(env);
-    let config = env.split('\r');
+    let config = env.split('\r\n');
     const configMap = config
       .filter((c) => {
         return c.startsWith('CONFIGURACION_');
@@ -62,7 +62,7 @@ export class ConfiguracionService {
         res.push(`${key}=${config[key]}`);
       }
     });
-    await fs.writeFile(join(process.cwd(), 'env', '.env'), res.join('\r'));
+    await fs.writeFile(join(process.cwd(), 'env', '.env'), res.join('\r\n'));
     return true;
   }
 }
