@@ -8,6 +8,7 @@ export class ConfiguracionService {
     const env = await fs.readFile(join(process.cwd(), 'env', '.env'), 'utf-8');
     console.log(env);
     const config = env.split('\r\n');
+    console.log(config)
     const configMap = config
       .filter((c) => {
         return c.startsWith('CONFIGURACION_');
