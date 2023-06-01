@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import * as fs from 'fs/promises';
 import { join } from 'path';
 import { Workbook } from 'exceljs';
@@ -8,12 +8,15 @@ import { Model } from 'mongoose';
 import { ClienteDocument } from './clientes/schemas/clientes.schema';
 import { ExpedienteDocument } from './expedientes/schemas/expediente.schema';
 import { UsuarioDocument } from './usuarios/schemas/usuarios.schema';
+import { ColaboradorDocument } from './colaboradores/colaborador.schema';
 
 @Injectable()
 export class AppService {
   constructor(
     @InjectModel('usuario') private usuariosModel: Model<UsuarioDocument>,
     @InjectModel('cliente') private clientesModel: Model<ClienteDocument>,
+    @InjectModel('colaborador')
+    private colaboradoresModel: Model<ColaboradorDocument>,
     @InjectModel('expediente')
     private expedientesModel: Model<ExpedienteDocument>,
   ) {}
@@ -52,6 +55,10 @@ export class AppService {
       ]);
     }
     usuarios = await this.usuariosModel.find({});
+    //Creamos el colaborador auxiliar
+    const auxColaborador = await this.colaboradoresModel.create({
+      nombre: 'Ajuste de Origen',
+    });
     const filePath = join(process.cwd(), '/excel/EXPEDIENTES.xlsx');
     const file = await fs.readFile(filePath);
     const workbook = new Workbook();
@@ -107,14 +114,27 @@ export class AppService {
       }
       return { ...e, numero_expediente: id };
     });
-
+    const numeros_expedientes = [];
+    const expedientes_repedidos = [];
+    excel.forEach((e) => {
+      const index = numeros_expedientes.findIndex((num) => {
+        return num === e.numero_expediente;
+      });
+      if (index !== -1) {
+        expedientes_repedidos.push(e.numero_expediente);
+      }
+      numeros_expedientes.push(e.numero_expediente);
+    });
+    console.log(expedientes_repedidos);
+    if (expedientes_repedidos.length !== 0) {
+      throw new BadRequestException(expedientes_repedidos);
+    }
     //Preparamos los nombres de los clientes
     let clientesId = [];
     excel = excel.map((e) => {
       const clienteId = clientesId.find((clienteId) => {
         return clienteId.clienteExcel === e.cliente;
       });
-      console.log(e.numero_expediente)
       const nombreSeparado: Array<string> = e.cliente.split(' ');
       let nombre = '';
       let apellido1 = '';
@@ -168,7 +188,6 @@ export class AppService {
           tipo,
         });
       }
-
       if (!clienteId && tipo === 'EMPRESA') {
         razon_social = e.cliente;
         clientesId.push({
@@ -228,6 +247,25 @@ export class AppService {
 
     //Preparamos los tipos y colaboradores
     excel = excel.map((e) => {
+      if (e.realiza === 'INMA') {
+        const tipo = e.realiza;
+        return {
+          ...e,
+          tipo,
+          colaboradores: [
+            {
+              usuario: auxColaborador._id,
+              importe: Number(e.colaboradores || 0),
+              pagos: [
+                {
+                  usuario: auxColaborador._id,
+                  importe: Number(e.colaboradores || 0),
+                },
+              ],
+            },
+          ],
+        };
+      }
       if ((e.realiza as string).includes('/')) {
         const [tipo, colaborador] = e.realiza.split('/');
         const usuario = usuarios.find((usuario) => {
@@ -244,6 +282,16 @@ export class AppService {
                 importe: Number(e.importe || 0) / 2,
                 pagos: [
                   { usuario: usuario._id, importe: Number(e.importe || 0) / 2 },
+                ],
+              },
+              {
+                usuario: auxColaborador._id,
+                importe: Number(e.colaboradores || 0),
+                pagos: [
+                  {
+                    usuario: auxColaborador._id,
+                    importe: Number(e.colaboradores || 0),
+                  },
                 ],
               },
             ],
