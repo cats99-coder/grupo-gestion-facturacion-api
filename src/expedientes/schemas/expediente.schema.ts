@@ -1,4 +1,4 @@
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, mongo } from 'mongoose';
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Usuario } from 'src/usuarios/schemas/usuarios.schema';
 import { Cliente } from 'src/clientes/schemas/clientes.schema';
@@ -8,8 +8,12 @@ export type ExpedienteDocument = HydratedDocument<Expediente>;
 
 @Schema()
 class Suplido {
-  @Prop()
+  @Prop({ default: '' })
   concepto: string;
+  @Prop({ default: new Date() })
+  fecha: Date;
+  @Prop({ default: false })
+  abonado: boolean;
   @Prop()
   importe: number;
 }
@@ -30,6 +34,8 @@ const EstadoSchema = SchemaFactory.createForClass(Estado);
 class Pago {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'usuario' })
   usuario: Usuario;
+  @Prop({ default: new Date() })
+  fecha: Date;
   @Prop({ default: 0 })
   importe: number;
 }
@@ -48,19 +54,29 @@ class Colaborador {
 
 const ColaboradorSchema = SchemaFactory.createForClass(Colaborador);
 
-@Schema()
+@Schema({ toJSON: { virtuals: true } })
 class Cobro {
-  @Prop()
-  tipo: 'BIZUM C' | 'EFECTIVO R';
+  @Prop({ enum: ['GENERAL', 'PROVISION', 'SUPLIDO'] })
+  tipo: 'GENERAL' | 'PROVISION' | 'SUPLIDO';
+  @Prop({ enum: ['BIZUM C', 'EFECTIVO R', ''] })
+  cobradoPor: 'BIZUM C' | 'EFECTIVO R' | '';
+  @Prop({ default: new Date() })
+  fecha: Date;
+  @Prop({ type: mongoose.Types.ObjectId })
+  suplido: mongoose.Types.ObjectId;
   @Prop({ default: 0 })
   importe: number;
 }
 
 const CobroSchema = SchemaFactory.createForClass(Cobro);
 
+CobroSchema.virtual('suplidoRef').get(function () {
+  return this.suplido;
+});
+
 @Schema({})
 export class Expediente {
-  @Prop({ type: Number, required: true, unique: true, index: true })
+  @Prop({ type: Number, required: true, unique: true })
   numero_expediente: number;
   @Prop({ default: new Date() })
   fecha: Date;
@@ -84,7 +100,7 @@ export class Expediente {
   colaboradores: Colaborador[];
   @Prop({ type: [CobroSchema] })
   cobros: Cobro[];
-  @Prop({ default: 'RUBEN' })
+  @Prop({ default: 'RUBEN', enum: ['RUBEN', 'INMA', 'ANDREA', 'CRISTINA'] })
   tipo: 'RUBEN' | 'INMA' | 'ANDREA' | 'CRISTINA';
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'factura' })
   factura: Factura;

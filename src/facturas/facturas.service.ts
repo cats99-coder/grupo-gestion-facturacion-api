@@ -155,7 +155,7 @@ export class FacturasService {
         });
       }
       const priceNumber = Number(price);
-      return priceNumber.toLocaleString('es', {
+      return priceNumber.toLocaleString('de-DE', {
         style: 'currency',
         currency: 'EUR',
       });

@@ -4,11 +4,12 @@ import { join } from 'path';
 import { Workbook } from 'exceljs';
 import { ClientesService } from './clientes/clientes.service';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { ClienteDocument } from './clientes/schemas/clientes.schema';
 import { ExpedienteDocument } from './expedientes/schemas/expediente.schema';
 import { UsuarioDocument } from './usuarios/schemas/usuarios.schema';
 import { ColaboradorDocument } from './colaboradores/colaborador.schema';
+import { objectId } from './utils/numeros';
 
 @Injectable()
 export class AppService {
@@ -21,44 +22,6 @@ export class AppService {
     private expedientesModel: Model<ExpedienteDocument>,
   ) {}
   async getHello() {
-    let usuarios = await this.usuariosModel.find({});
-    if (usuarios.length === 0) {
-      await this.usuariosModel.create([
-        {
-          email: '',
-          nombre: 'Rubén',
-          password: '7x!yxWtA',
-          rol: 'RUBEN',
-          usuario: 'ruben',
-        },
-        {
-          email: '',
-          nombre: 'Inma',
-          password: '&4K9t%Go',
-          rol: 'INMA',
-          usuario: 'inma',
-        },
-        {
-          email: '',
-          nombre: 'Andrea',
-          password: 'HtM!jT8e',
-          rol: 'ANDREA',
-          usuario: 'andrea',
-        },
-        {
-          email: '',
-          nombre: 'Cristina',
-          password: '52kKnR@a',
-          rol: 'CRISTINA',
-          usuario: 'cristina',
-        },
-      ]);
-    }
-    usuarios = await this.usuariosModel.find({});
-    //Creamos el colaborador auxiliar
-    const auxColaborador = await this.colaboradoresModel.create({
-      nombre: 'Ajuste de Origen',
-    });
     const filePath = join(process.cwd(), '/excel/EXPEDIENTES.xlsx');
     const file = await fs.readFile(filePath);
     const workbook = new Workbook();
@@ -82,18 +45,6 @@ export class AppService {
         cobros: { importe: row.values[16], concepto: row.values[19] },
         pagoColaborador: row.values[19],
       });
-    });
-
-    //Preparamos el IVA
-    excel = excel.map((e) => {
-      const importe = e.importe || 0;
-      const colaboradores = e.colaboradores || 0;
-      if (e.IVA) {
-        const IVA = (e.IVA * 100) / (importe + colaboradores);
-        return { ...e, IVA };
-      }
-
-      return e;
     });
     //Preparamos las fechas de los expedientes
     excel = excel.map((e) => {
@@ -129,6 +80,55 @@ export class AppService {
     if (expedientes_repedidos.length !== 0) {
       throw new BadRequestException(expedientes_repedidos);
     }
+    let usuarios = await this.usuariosModel.find({});
+    if (usuarios.length === 0) {
+      await this.usuariosModel.create([
+        {
+          email: '',
+          nombre: 'Rubén',
+          password: '1111',
+          rol: 'RUBEN',
+          usuario: 'ruben',
+        },
+        {
+          email: '',
+          nombre: 'Inma',
+          password: '1111',
+          rol: 'INMA',
+          usuario: 'inma',
+        },
+        {
+          email: '',
+          nombre: 'Andrea',
+          password: '1111',
+          rol: 'ANDREA',
+          usuario: 'andrea',
+        },
+        {
+          email: '',
+          nombre: 'Cristina',
+          password: '1111',
+          rol: 'CRISTINA',
+          usuario: 'cristina',
+        },
+      ]);
+    }
+    usuarios = await this.usuariosModel.find({});
+    //Creamos el colaborador auxiliar
+    const auxColaborador = await this.colaboradoresModel.create({
+      nombre: 'Ajuste de Origen',
+    });
+    //Preparamos el IVA
+    excel = excel.map((e) => {
+      const importe = e.importe || 0;
+      const colaboradores = e.colaboradores || 0;
+      if (e.IVA) {
+        const IVA = (e.IVA * 100) / (importe + colaboradores);
+        return { ...e, IVA };
+      }
+
+      return e;
+    });
     //Preparamos los nombres de los clientes
     let clientesId = [];
     excel = excel.map((e) => {
@@ -210,6 +210,7 @@ export class AppService {
         clienteExcel: e.cliente,
       };
     });
+
     //Creamos los clientes y cargamos su id
     clientesId = await Promise.all(
       clientesId.map(async (clienteId) => {
@@ -225,46 +226,140 @@ export class AppService {
       });
       return { ...e, cliente: cliente._id };
     });
+    console.log('clientes');
     //Preparamos los suplidos y cobros
     excel = excel.map((e) => {
       const suplidos = [];
-      if (e.suplidos) {
-        suplidos.push({
-          tipo: '',
-          importe: e.suplidos,
-        });
-      }
       const cobros = [];
       if (e.cobros.importe) {
-        const tipo = e.cobros.concepto || '';
-        cobros.push({
-          tipo: tipo === 'SI' ? '' : tipo,
-          importe: e.cobros.importe,
-        });
+        const fecha = new Date(e.fecha).getTime();
+        const fechaFin = new Date('01-01-2023').getTime();
+        //Tiene un suplido
+        if (e.suplidos) {
+          const id = objectId();
+          suplidos.push({
+            _id: new mongoose.Types.ObjectId(id),
+            concepto: '',
+            abonado: fecha > fechaFin ? false : true,
+            importe: e.suplidos,
+          });
+          if (e.cobros.concepto !== 'SI' && e.cobros.concepto !== '') {
+            cobros.push(
+              {
+                tipo: 'SUPLIDO',
+                suplido: new mongoose.Types.ObjectId(id),
+                importe: e.suplidos,
+              },
+              {
+                tipo: 'GENERAL',
+                cobradoPor: e.cobros.concepto,
+                importe:
+                  Number(e.cobros.importe || 0) - Number(e.suplidos || 0),
+              },
+            );
+          } else {
+            cobros.push(
+              {
+                tipo: 'SUPLIDO',
+                suplido: new mongoose.Types.ObjectId(id),
+                importe: e.suplidos,
+              },
+              {
+                tipo: 'GENERAL',
+                importe:
+                  Number(e.cobros.importe || 0) - Number(e.suplidos || 0),
+              },
+            );
+          }
+        }
+        //No tiene suplido
+        else {
+          if (e.cobros.concepto !== 'SI' && e.cobros.concepto !== '') {
+            cobros.push({
+              tipo: 'GENERAL',
+              cobradoPor: e.cobros.concepto,
+              importe: Number(e.cobros.importe || 0),
+            });
+          } else {
+            cobros.push({
+              tipo: 'GENERAL',
+              importe: Number(e.cobros.importe || 0),
+            });
+          }
+        }
+      } else {
+        if (e.suplidos) {
+          const fecha = new Date(e.fecha).getTime();
+          const fechaFin = new Date('01-01-2023').getTime();
+          const id = objectId();
+          suplidos.push({
+            _id: new mongoose.Types.ObjectId(id),
+            concepto: '',
+            abonado: fecha > fechaFin ? false : true,
+            importe: e.suplidos,
+          });
+        }
       }
       return { ...e, suplidos, cobros };
     });
-
+    console.log('suplidos');
     //Preparamos los tipos y colaboradores
     excel = excel.map((e) => {
       if (e.realiza === 'INMA') {
-        const tipo = e.realiza;
-        return {
-          ...e,
-          tipo,
-          colaboradores: [
-            {
-              usuario: auxColaborador._id,
-              importe: Number(e.colaboradores || 0),
-              pagos: [
-                {
-                  usuario: auxColaborador._id,
-                  importe: Number(e.colaboradores || 0),
-                },
-              ],
-            },
-          ],
-        };
+        if (e.colaboradores) {
+          const tipo = e.realiza;
+          return {
+            ...e,
+            tipo,
+            colaboradores: [
+              {
+                usuario: auxColaborador._id,
+                importe: Number(e.colaboradores || 0),
+                pagos: [
+                  {
+                    usuario: auxColaborador._id,
+                    importe: Number(e.colaboradores || 0),
+                  },
+                ],
+              },
+            ],
+          };
+        } else {
+          const tipo = e.realiza;
+          return {
+            ...e,
+            tipo,
+            colaboradores: [],
+          };
+        }
+      }
+      if (e.realiza === 'RUBEN') {
+        if (e.colaboradores) {
+          const tipo = e.realiza;
+          return {
+            ...e,
+            tipo,
+            colaboradores: [
+              {
+                usuario: auxColaborador._id,
+                importe: Number(e.colaboradores || 0),
+                pagos: [
+                  {
+                    usuario: auxColaborador._id,
+                    importe: Number(e.colaboradores || 0),
+                  },
+                ],
+              },
+            ],
+          };
+        } else {
+          const tipo = e.realiza;
+          return {
+            ...e,
+            tipo,
+            colaboradores: [],
+          };
+        }
       }
       if ((e.realiza as string).includes('/')) {
         const [tipo, colaborador] = e.realiza.split('/');
@@ -326,9 +421,18 @@ export class AppService {
         return { ...e, tipo, colaboradores: [] };
       }
     });
+    console.log('colaboradores');
     //Creamos los expedientes
     excel = await Promise.all(
       excel.map(async (e, index) => {
+        if (e.tipo === 'inma') {
+          console.log(e);
+        }
+        e.cobros.forEach((element) => {
+          if (Number.isNaN(element.importe)) {
+            console.log(e);
+          }
+        });
         if (e.colaboradores.length !== 0) {
           if (Number.isNaN(e.colaboradores[0].importe)) {
             console.log(e);
