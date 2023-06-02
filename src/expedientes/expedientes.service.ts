@@ -37,7 +37,7 @@ export class ExpedientesService {
   async getById(_id) {
     return await this.expedienteModel
       .findById(_id)
-      .populate(['cliente', 'factura', 'colaboradores.usuario']);
+      .populate(['cliente', 'factura']);
   }
   async create(req: Request, expediente) {
     const maximo = await this.expedienteModel
