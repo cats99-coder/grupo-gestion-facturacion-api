@@ -9,4 +9,8 @@ export class AppController {
   async getHello() {
     return await this.appService.getHello();
   }
+  @Get('cambiarDatosCristina')
+  async cambiarDatosCristina() {
+    return await this.appService.cambiarDatosCristina();
+  }
 }

@@ -445,4 +445,67 @@ export class AppService {
     );
     return excel;
   }
+  async cambiarDatosCristina() {
+    let expedientes = await this.expedientesModel
+      .find({
+        tipo: 'CRISTINA',
+      })
+      .sort({ numero_expediente: 1 })
+      .lean()
+      .exec();
+    const ruben = await this.usuariosModel.findOne({ rol: 'RUBEN' });
+    expedientes = expedientes.map((expediente) => {
+      let importe = expediente.importe;
+      //Tiene colaborador
+      if (expediente.colaboradores.length !== 0) {
+        const aux = expediente.colaboradores[0].importe;
+        expediente.colaboradores[0].importe = importe;
+        if (expediente.colaboradores[0].pagos.length !== 0) {
+          expediente.colaboradores[0].pagos[0].importe = importe;
+        }
+        importe = aux;
+        //No tiene colaborador
+      } else {
+        importe *= 0.5;
+        expediente.colaboradores.push({
+          usuario: ruben,
+          importe: importe,
+          pagos: [
+            {
+              fecha: new Date(),
+              importe,
+              usuario: ruben,
+            },
+          ],
+        });
+      }
+      return { ...expediente, importe };
+    });
+    const suma = expedientes.reduce(
+      (suma: any, expediente: any) => {
+        suma.sumaImporte += Number(expediente.importe || 0);
+        suma.sumaColaboradores += expediente.colaboradores.reduce(
+          (suma, colaborador) => {
+            return suma + Number(colaborador.importe || 0);
+          },
+          0,
+        );
+        return suma;
+      },
+      {
+        sumaImporte: 0,
+        sumaColaboradores: 0,
+      },
+    );
+    await this.expedientesModel.deleteMany({ tipo: 'CRISTINA' });
+    await this.expedientesModel.create(expedientes);
+    return [
+      {
+        ruben,
+        'Suma Importes': suma.sumaImporte,
+        'Suma Colaboradores': suma.sumaColaboradores,
+      },
+      expedientes,
+    ];
+  }
 }
