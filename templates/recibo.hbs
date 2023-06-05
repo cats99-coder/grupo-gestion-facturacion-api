@@ -8,7 +8,7 @@
   </head>
   <body>
     <main
-      class='p-3 border-2 border-blue-800 gap-3 flex flex-col text-blue-800 min-h-screen rounded-md'
+      class='p-3 border-2 border-blue-800 gap-3 flex flex-col text-blue-800 h-[50vh] rounded-md'
     >
       <section class='flex items-center justify-end space-x-2'>
         <img
@@ -55,28 +55,39 @@
       <section class='flex flex-col gap-1'>
         <span class='w-8 mb-2'>por:</span>
         <div class='flex flex-col gap-5'>
+          {{#if pagoImportePositive}}
+            <div class='w-full border-b-2 border-blue-800'>
+              <div class='w-full'>
+                Número de Expediente:
+                {{expediente.numero_expediente}}
+                -
+                {{expediente.concepto}}
+                -
+                {{price pagoImporte}}
+              </div>
+            </div>
+          {{/if}}
+          {{#if suplidos.[0].importe}}
           <div class='w-full border-b-2 border-blue-800'>
-            <div class='w-full'></div>
+            <div class='w-full'>
+              SUPLIDO: {{suplidos.[0].concepto}} - {{price suplidos.[0].aPagar}} 
+            </div>
           </div>
+          {{/if}}
+          {{#if suplidos.[1].importe}}
           <div class='w-full border-b-2 border-blue-800'>
-            <div class='w-full'></div>
+            <div class='w-full'>
+              SUPLIDO: {{suplidos.[1].concepto}} - {{price suplidos.[1].aPagar}} 
+            </div>
           </div>
+          {{/if}}
+          {{#if suplidos.[2].importe}}
           <div class='w-full border-b-2 border-blue-800'>
-            <div class='w-full'></div>
+            <div class='w-full'>
+              SUPLIDO: {{suplidos.[2].concepto}} - {{price suplidos.[2].aPagar}} 
+            </div>
           </div>
-          <div class='w-full border-b-2 border-blue-800'>
-            <div class='w-full'></div>
-          </div>
-          <div class='w-full border-b-2 border-blue-800'>
-            <div class='w-full'></div>
-          </div>
-          <div class='w-full border-b-2 border-blue-800'>
-            <div class='w-full'></div>
-          </div>
-          <div class='w-full border-b-2 border-blue-800'>
-            <div class='w-full'></div>
-          </div>
-        </div>
+          {{/if}}
       </section>
       <section class='grid grow grid-cols-3'>
         <div class='col-span-2 flex selft-end'>

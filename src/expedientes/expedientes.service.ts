@@ -113,7 +113,12 @@ export class ExpedientesService {
     const filePath = join(process.cwd(), 'templates', `recibo.hbs`);
     const filePathRecibos = join(process.cwd(), 'recibos');
     const recibos = await fs.readdir(filePathRecibos);
-    console.log(recibos);
+    const pagoImporte =
+      recibo.pagoCliente -
+      recibo.suplidos.reduce((suma, suplido) => {
+        return suma + Number(suplido.importe);
+      }, 0);
+    const pagoImportePositive = pagoImporte > 0;
     const html = await fs.readFile(filePath, { encoding: 'utf8' });
     const compile = Handlebars.compile(html);
     const now = new Date();
@@ -148,7 +153,14 @@ export class ExpedientesService {
       return Number(num) + 1;
     };
     const numero_recibo = recibos.length === 0 ? 1 : maxRecibo();
-    const htmlCompiled = compile({ ...recibo, ...fecha, numero_recibo });
+    const htmlCompiled = compile({
+      ...recibo,
+      ...fecha,
+      numero_recibo,
+      pagoImportePositive,
+      pagoImporte
+    });
+    console.log(recibo);
     const browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox'],
@@ -158,8 +170,8 @@ export class ExpedientesService {
     const pdf = await page.pdf({
       margin: { top: '1cm', right: '1cm', bottom: '1cm', left: '1cm' },
       printBackground: true,
-      landscape: true,
-      format: 'A5',
+      landscape: false,
+      format: 'A4',
     });
     await browser.close();
     await fs.writeFile(
