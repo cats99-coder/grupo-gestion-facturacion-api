@@ -1,0 +1,107 @@
+<html lang='es'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <script src='https://cdn.tailwindcss.com'></script>
+    <title>Recibo</title>
+  </head>
+  <body>
+    <main
+      class='p-3 border-2 border-blue-800 gap-3 flex flex-col text-blue-800 min-h-screen rounded-md'
+    >
+      <section class='flex items-center justify-end space-x-2'>
+        <img
+          src='http://localhost:3000/logo.png'
+          width='50'
+          height='50'
+          alt=''
+        />
+        <span class='text-3xl font-bold text-orange-700'>RECIBO</span>
+        <div
+          class='border-2 border-blue-800 bg-orange-200 flex p-1 rounded-md items-end'
+        >
+          <span class='font-bold'>Nº</span>
+          <div class='w-52 border-b-2 border-blue-800 justify-self-end'>
+            <div class='w-full font-bold text-end'>{{zfill numero_recibo}}</div>
+          </div>
+        </div>
+      </section>
+      <section class='flex gap-1 self-end'>
+        <div class='w-24 border-b-2 border-blue-800 justify-self-end'>
+          <div class='w-full text-end'>{{zfill2 dia}}</div>
+        </div>
+        <span>de</span>
+        <div class='w-32 border-b-2 border-blue-800 justify-self-end'>
+          <div class='w-full text-end'>{{mes}}</div>
+        </div>
+        <span>de 20</span>
+        <div class='w-24 border-b-2 border-blue-800 justify-self-end'>
+          <div class='w-full'>{{zfill2 year}}</div>
+        </div>
+      </section>
+      <section class='flex gap-1'>
+        <span class='w-24'>Recibí de</span>
+        <div class='w-full border-b-2 border-blue-800'>
+          <div class='w-full'>{{expediente.cliente.nombreCompleto}}</div>
+        </div>
+      </section>
+      <section class='flex gap-1'>
+        <span class='w-48'>la cantidad de Euros</span>
+        <div class='w-full bg-blue-200 rounded-md px-2'>
+          <div class='w-full'>{{price pagoCliente}}</div>
+        </div>
+      </section>
+      <section class='flex flex-col gap-1'>
+        <span class='w-8 mb-2'>por:</span>
+        <div class='flex flex-col gap-5'>
+          <div class='w-full border-b-2 border-blue-800'>
+            <div class='w-full'></div>
+          </div>
+          <div class='w-full border-b-2 border-blue-800'>
+            <div class='w-full'></div>
+          </div>
+          <div class='w-full border-b-2 border-blue-800'>
+            <div class='w-full'></div>
+          </div>
+          <div class='w-full border-b-2 border-blue-800'>
+            <div class='w-full'></div>
+          </div>
+          <div class='w-full border-b-2 border-blue-800'>
+            <div class='w-full'></div>
+          </div>
+          <div class='w-full border-b-2 border-blue-800'>
+            <div class='w-full'></div>
+          </div>
+          <div class='w-full border-b-2 border-blue-800'>
+            <div class='w-full'></div>
+          </div>
+        </div>
+      </section>
+      <section class='grid grow grid-cols-3'>
+        <div class='col-span-2 flex selft-end'>
+          <section class='flex gap-1 w-full items-center self-end'>
+            <span class=''>SON</span>
+            <div class='bg-orange-200 w-72 rounded-md px-2'>
+              <div class='w-full font-extrabold'>{{pricesin pagoCliente}}</div>
+            </div>
+            <div class='flex items-end ml-2 font-bold'>
+              <span class='text-2xl'>€</span>
+              <span class=''>euros</span>
+            </div>
+          </section>
+        </div>
+        <div class='flex flex-col justify-between'>
+          <span class='w-52'>Recibí:</span>
+          <div class='flex w-full gap-2'>
+            <span class='justify-self-end'>Fdo:</span>
+            <div class='grow border-b-2 border-blue-800'>
+              <div class='w-full'></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class='flex gap-1 self-end'></section>
+    </main>
+  </body>
+</html>

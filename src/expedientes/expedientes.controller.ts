@@ -6,6 +6,7 @@ import {
   Body,
   Param,
   UseGuards,
+  Res,
   Req,
 } from '@nestjs/common';
 import { ExpedientesService } from './expedientes.service';
@@ -39,11 +40,24 @@ export class ExpedientesController {
   async getColaboraciones(@Body('usuario') usuario) {
     return await this.expedientesService.getColaboraciones(usuario);
   }
+  @Post('imprimirRecibo')
+  async imprimir(@Res({ passthrough: true }) res, @Body() recibo) {
+    res.set({
+      // pdf
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename=invoice.pdf',
+      // prevent cache
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    });
+    return this.expedientesService.getRecibo(recibo);
+  }
   @Post(':id')
   async update(@Body() expediente, @Param('id') id) {
     return await this.expedientesService.update(id, expediente);
   }
-  @Delete(':id')  
+  @Delete(':id')
   async delete(@Param('id') id) {
     return await this.expedientesService.delete(id);
   }
