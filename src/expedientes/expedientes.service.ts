@@ -15,6 +15,7 @@ import * as fs from 'fs/promises';
 import Handlebars from 'handlebars';
 import puppeteer from 'puppeteer';
 import { zfill } from 'src/utils/numeros';
+import { Colaborador } from 'src/colaboradores/colaborador.schema';
 
 @Injectable()
 export class ExpedientesService {
@@ -158,7 +159,7 @@ export class ExpedientesService {
       ...fecha,
       numero_recibo,
       pagoImportePositive,
-      pagoImporte
+      pagoImporte,
     });
     console.log(recibo);
     const browser = await puppeteer.launch({
@@ -199,6 +200,8 @@ export class ExpedientesService {
         {},
         {},
       )
+      .sort({ numero_expediente: -1 })
+      .populate('cliente')
       .exec();
     return expedientes.map((expediente) => {
       return expediente.toObject();
@@ -208,48 +211,34 @@ export class ExpedientesService {
     //Buscamos los expedientes en lo que aparece en colaboraciones
     const expedientesConColaboraciones =
       await this.getExpedientesColaboraciones(usuario);
-    const deudores = expedientesConColaboraciones.reduce(
-      (prev: Deudor[], current) => {
-        const usuarioIndex = prev.findIndex((value) => {
-          return value.tipo === current.tipo;
-        });
-        if (usuarioIndex !== -1) {
-          prev[usuarioIndex].deudas.push(
-            ...current.colaboradores
-              .filter((value) => {
-                return (value.usuario as any).equals(usuario);
-              })
-              .map((value) => {
-                return {
-                  expediente: current.numero_expediente,
-                  importe: value.importe,
-                  pagos: value.pagos,
-                  usuario: value.usuario,
-                };
-              }),
-          );
-          return prev;
-        } else {
-          const colaboraciones: Deuda[] = current.colaboradores
-            .filter((value) => {
-              return (value.usuario as any).equals(usuario);
-            })
-            .map((value) => {
-              return {
-                expediente: current.numero_expediente,
-                importe: value.importe,
-                pagos: value.pagos,
-              };
-            });
-          prev.push({
-            tipo: current.tipo,
-            deudas: colaboraciones,
+    const deudores = expedientesConColaboraciones.reduce((prev, expediente) => {
+      const index = prev.findIndex((value) => {
+        return value.tipo === expediente.tipo;
+      });
+      expediente.colaboradores.forEach((colaborador) => {
+        if (!(colaborador.usuario as any).equals(usuario)) return;
+        if (index !== -1) {
+          prev[index].deudas.push({
+            expediente,
+            pagos: colaborador.pagos,
+            importe: colaborador.importe,
           });
-          return prev;
+        } else {
+          prev.push({
+            tipo: expediente.tipo,
+            deudas: [
+              {
+                expediente,
+                pagos: colaborador.pagos,
+                importe: colaborador.importe,
+              },
+            ],
+          });
         }
-      },
-      [],
-    );
+      });
+      return prev;
+    }, []);
+    console.log(deudores);
     return deudores;
   }
 }
