@@ -15,7 +15,6 @@ import * as fs from 'fs/promises';
 import Handlebars from 'handlebars';
 import puppeteer from 'puppeteer';
 import { zfill } from 'src/utils/numeros';
-import { Colaborador } from 'src/colaboradores/colaborador.schema';
 
 @Injectable()
 export class ExpedientesService {
@@ -223,6 +222,25 @@ export class ExpedientesService {
             pagos: colaborador.pagos,
             importe: colaborador.importe,
           });
+          prev[index].pagosHistorial.push(
+            ...colaborador.pagos.reduce((pagos, pago) => {
+              const index = pagos.findIndex((p) => {
+                return (pago as any)._id.equals(p._id);
+              });
+              if (index !== -1) {
+                pagos[index].importe += pago.importe;
+                pagos[index].expedientes.push(expediente.numero_expediente);
+              } else {
+                pagos.push({
+                  _id: (pago as any)._id,
+                  fecha: pago.fecha,
+                  importe: pago.importe,
+                  expedientes: [expediente.numero_expediente],
+                });
+              }
+              return pagos;
+            }, []),
+          );
         } else {
           prev.push({
             tipo: expediente.tipo,
@@ -233,12 +251,31 @@ export class ExpedientesService {
                 importe: colaborador.importe,
               },
             ],
+            pagosHistorial: colaborador.pagos.reduce((pagos, pago) => {
+              const index = pagos.findIndex((p) => {
+                if ((pago as any)._id.equals(p._id)) {
+                  console.log('Lo encontro!!!');
+                }
+                return (pago as any)._id.equals(p._id);
+              });
+              if (index !== -1) {
+                pagos[index].importe += pago.importe;
+                pagos[index].expedientes.push(expediente.numero_expediente);
+              } else {
+                pagos.push({
+                  _id: (pago as any)._id,
+                  fecha: pago.fecha,
+                  importe: pago.importe,
+                  expedientes: [expediente.numero_expediente],
+                });
+              }
+              return pagos;
+            }, []),
           });
         }
       });
       return prev;
     }, []);
-    console.log(deudores);
     return deudores;
   }
 }
