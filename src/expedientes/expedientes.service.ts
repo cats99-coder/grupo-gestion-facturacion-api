@@ -182,7 +182,10 @@ export class ExpedientesService {
   }
   async facturar(expedientes, factura) {
     expedientes.forEach(async (expediente) => {
-      await this.expedienteModel.findByIdAndUpdate(expediente, { factura });
+      await this.expedienteModel.findByIdAndUpdate(expediente._id, {
+        factura,
+        IVA: expediente.IVA,
+      });
     });
     return true;
   }

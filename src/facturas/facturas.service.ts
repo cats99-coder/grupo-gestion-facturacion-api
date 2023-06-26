@@ -119,7 +119,7 @@ export class FacturasService {
       tipo: factura.tipoParaFacturar,
       serie: factura.serie,
     });
-    const fecha = new Date();
+    const fecha = new Date(factura.fecha);
     fecha.setMilliseconds(0);
     fecha.setSeconds(0);
     fecha.setMinutes(0);
