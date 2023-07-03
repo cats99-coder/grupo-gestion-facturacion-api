@@ -40,7 +40,6 @@ export class RubenService {
     const cliente = (await this.clientesService.getById(params._id)).toObject();
     //Fecha
     const fecha = fechaLarga();
-    console.log(fecha)
     const htmlCompiled = compile({ ...params, cliente, fecha,  });
     const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
