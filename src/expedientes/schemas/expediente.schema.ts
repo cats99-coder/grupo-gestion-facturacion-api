@@ -90,6 +90,10 @@ export class Expediente {
   importe: number;
   @Prop({ default: 0 })
   IVA: number;
+  @Prop({default: false})
+  facturaNoCliente: boolean;
+  @Prop({default: 0})
+  perdidas: number;
   @Prop({ type: [SuplidoSchema] })
   suplidos: Suplido[];
   @Prop({ type: [EstadoSchema] })

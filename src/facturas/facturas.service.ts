@@ -186,7 +186,7 @@ export class FacturasService {
           result += compile({ ...factura, expedientes: exp });
         } else {
           const exp = expedientes.slice(i * num);
-          result += compile({ ...factura, expedientes: exp });
+           result += compile({ ...factura, expedientes: exp });
         }
       }
       return result;

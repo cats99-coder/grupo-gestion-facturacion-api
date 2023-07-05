@@ -7,6 +7,15 @@ export const calculoTotales = (factura: Factura) => {
       const index = prev.IVAs.findIndex((linea) => {
         return currentValue.IVA === linea.IVA;
       });
+      const colaboradores = currentValue.colaboradores.reduce(
+        (suma, colaborador) => {
+          return suma + colaborador.importe;
+        },
+        0,
+      );
+      if (!currentValue.facturaNoCliente) {
+        currentValue.importe += colaboradores;
+      }
       if (index !== -1) {
         prev.IVAs[index].total_concepto += currentValue.importe;
         prev.IVAs[index].importe_IVA +=
