@@ -23,6 +23,7 @@ import { fechaCorta } from 'src/utils/fecha';
 import { Workbook } from 'exceljs';
 import * as tmp from 'tmp';
 import { ClientesService } from 'src/clientes/clientes.service';
+import { Cliente, ClienteDocument } from 'src/clientes/schemas/clientes.schema';
 @Injectable()
 export class FacturasService {
   constructor(
@@ -67,7 +68,7 @@ export class FacturasService {
     //Comprobamos que todos sean del mismo tipo
     //Comprobamos que todos sean del mismo cliente
     const tipos = [];
-    const clientes = [];
+    const clientes: Cliente[] = [];
     const asyncEvery = async (arr, predicate) => {
       for (let e of arr) {
         if (!(await predicate(e))) return false;
@@ -99,9 +100,31 @@ export class FacturasService {
         // if (tipos.length > 1) throw new Error('Hay más de un tipo');
       });
       if (clientes.length === 0) throw new Error('No tiene clientes');
+      if (clientes[0].NIF === '' || !clientes[0].NIF)
+        throw new Error('No tiene NIF');
+      if (clientes[0].tipo === 'EMPRESA') {
+        if (clientes[0].razon_social === '' || !clientes[0].razon_social)
+          throw new Error('No tiene Razón social');
+      } else {
+        if (clientes[0].nombre === '' || !clientes[0].nombre)
+          throw new Error('No tiene Nombre');
+        if (clientes[0].apellido1 === '' || !clientes[0].apellido1)
+          throw new Error('No tiene Primer Apellido');
+      }
+      if (clientes[0].codigo_postal === '' || !clientes[0].codigo_postal)
+        throw new Error('No tiene Código Postal');
+      if (clientes[0].calle === '' || !clientes[0].calle)
+        throw new Error('No tiene Calle');
+      if (clientes[0].localidad === '' || !clientes[0].localidad)
+        throw new Error('No tiene Localidad');
+      if (clientes[0].provincia === '' || !clientes[0].provincia)
+        throw new Error('No tiene Provincia');
+      if (clientes[0].pais === '' || !clientes[0].pais)
+        throw new Error('No tiene NIF');
       if (tipos.length === 0)
         throw new Error('Falta algún tipo en un expediente');
     } catch (err) {
+      console.log(err);
       throw new HttpException(
         {
           status: HttpStatus.EXPECTATION_FAILED,
@@ -186,7 +209,7 @@ export class FacturasService {
           result += compile({ ...factura, expedientes: exp });
         } else {
           const exp = expedientes.slice(i * num);
-           result += compile({ ...factura, expedientes: exp });
+          result += compile({ ...factura, expedientes: exp });
         }
       }
       return result;
