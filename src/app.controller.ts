@@ -13,4 +13,8 @@ export class AppController {
   async cambiarDatosCristina() {
     return await this.appService.cambiarDatosCristina();
   }
+  @Get('tipoGestion')
+  async tipoGestion() {
+    return await this.appService.tipoGestion();
+  }
 }

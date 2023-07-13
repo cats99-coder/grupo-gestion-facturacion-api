@@ -90,9 +90,9 @@ export class Expediente {
   importe: number;
   @Prop({ default: 0 })
   IVA: number;
-  @Prop({default: false})
+  @Prop({ default: false })
   facturaNoCliente: boolean;
-  @Prop({default: 0})
+  @Prop({ default: 0 })
   perdidas: number;
   @Prop({ type: [SuplidoSchema] })
   suplidos: Suplido[];
@@ -106,6 +106,27 @@ export class Expediente {
   cobros: Cobro[];
   @Prop({ default: 'RUBEN', enum: ['RUBEN', 'INMA', 'ANDREA', 'CRISTINA'] })
   tipo: 'RUBEN' | 'INMA' | 'ANDREA' | 'CRISTINA';
+  @Prop({
+    enum: [
+      'ASOCIACIONES',
+      'EXTRANJERIA',
+      'FISCAL',
+      'LABORAL',
+      'LEGAL',
+      'REGISTRO CIVIL',
+      'TRAFICO',
+      'VARIOS',
+    ],
+  })
+  tipoGestion:
+    | 'ASOCIACIONES'
+    | 'EXTRANJERIA'
+    | 'FISCAL'
+    | 'LABORAL'
+    | 'LEGAL'
+    | 'REGISTRO CIVIL'
+    | 'TRAFICO'
+    | 'VARIOS';
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'factura' })
   factura: Factura;
 }

@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientesModule } from './clientes/clientes.module';
@@ -23,8 +23,8 @@ import { ConfiguracionModule } from './configuracion/configuracion.module';
     MongooseModule.forRoot(
       `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/grupo-gestion`,
       {
-        autoIndex: true
-      }
+        autoIndex: true,
+      },
     ),
     UsuariosModule,
     ExpedientesModule,

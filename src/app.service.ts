@@ -9,7 +9,7 @@ import { ClienteDocument } from './clientes/schemas/clientes.schema';
 import { ExpedienteDocument } from './expedientes/schemas/expediente.schema';
 import { UsuarioDocument } from './usuarios/schemas/usuarios.schema';
 import { ColaboradorDocument } from './colaboradores/colaborador.schema';
-import { objectId } from './utils/numeros';
+import { objectId, zfill } from './utils/numeros';
 
 @Injectable()
 export class AppService {
@@ -507,5 +507,32 @@ export class AppService {
       },
       expedientes,
     ];
+  }
+  async tipoGestion() {
+    const filePath = join(process.cwd(), '/excel/TIPOGESTION.xlsx');
+    const file = await fs.readFile(filePath);
+    const workbook = new Workbook();
+    await workbook.xlsx.load(file);
+    const ws = workbook.worksheets[0];
+    const excel = [];
+    ws.eachRow(function (row, rowNumber) {
+      if (rowNumber === 1) return;
+      excel.push({
+        year: row.values[1],
+        numero: row.values[2],
+        tipoGestion: row.values[3],
+      });
+    });
+    excel.forEach(async (e) => {
+      const numero = e.year
+        ? Number(e.year) * 10000 + Number(e.numero)
+        : Number(e.numero);
+      const res = await this.expedientesModel.updateOne(
+        { numero_expediente: numero },
+        { $set: { tipoGestion: e.tipoGestion } },
+      );
+      console.log(res);
+    });
+    return excel;
   }
 }

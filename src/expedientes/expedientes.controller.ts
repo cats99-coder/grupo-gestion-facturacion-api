@@ -25,7 +25,7 @@ export class ExpedientesController {
     return await this.expedientesService.getById(id);
   }
   @Post('')
-  async create(@Req() req: Request, @Body() expediente) {
+  async create(@Req() req, @Body() expediente) {
     return await this.expedientesService.create(req, expediente);
   }
   @Post('porFacturar')
@@ -33,7 +33,7 @@ export class ExpedientesController {
     return await this.expedientesService.getByTipo();
   }
   @Post('porCliente')
-  async getByClient(@Req() req: Request, @Body('cliente') cliente) {
+  async getByClient(@Req() req, @Body('cliente') cliente) {
     return await this.expedientesService.getByClient(req, cliente);
   }
   @Post('colaboraciones')

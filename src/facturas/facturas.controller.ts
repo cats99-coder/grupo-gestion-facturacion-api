@@ -22,11 +22,11 @@ export class FacturasController {
     return await this.facturasService.getAll();
   }
   @Post('')
-  async create(@Req() req: Request, @Body() factura) {
+  async create(@Req() req, @Body() factura) {
     return await this.facturasService.create(factura, req);
   }
   @Post('porCliente')
-  async getByClient(@Req() req: Request, @Body('cliente') cliente) {
+  async getByClient(@Req() req, @Body('cliente') cliente) {
     return await this.facturasService.getByClient(req, cliente);
   }
   @Post('generarExcel')

@@ -28,7 +28,7 @@ export class UsuariosController {
   }
   @Post('changePassword')
   async changePassword(
-    @Req() req: Request,
+    @Req() req,
     @Body('oldPassword') oldPassword,
     @Body('newPassword') newPassword,
   ) {
