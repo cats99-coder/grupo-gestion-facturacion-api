@@ -275,9 +275,10 @@ export class FacturasService {
     //Introducimos los datos
     const lineas = facturas.flatMap((factura: any) => {
       const fechaAnterior = new Date(factura.fecha).getTime();
-      const fecha = new Date(
-        fechaAnterior + 60 * 60 * 2 * 1000,
-      ).toLocaleDateString();
+      const fechaMasDos = new Date(fechaAnterior + 60 * 60 * 2 * 1000);
+      const fecha = `${fechaMasDos.getDate()}/${
+        fechaMasDos.getMonth() + 1
+      }/${fechaMasDos.getFullYear()}`;
       const cliente = factura.cliente;
       const direccion = `${cliente.calle}, ${cliente.localidad} ${cliente.codigo_postal} ${cliente.provincia}`;
       return factura.expedientes.map((expediente) => {
