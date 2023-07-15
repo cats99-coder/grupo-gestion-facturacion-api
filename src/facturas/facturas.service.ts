@@ -284,7 +284,7 @@ export class FacturasService {
       return factura.expedientes.flatMap((expediente) => {
         const colaboradores = expediente.colaboradores.reduce(
           (suma, colaborador) => {
-            return Number(colaborador) + suma;
+            return Number(colaborador.importe) + suma;
           },
           0,
         );
