@@ -265,20 +265,38 @@ export class FacturasService {
     sheet.columns = [
       { header: 'Fecha Factura', key: 'fecha', width: 20 },
       { header: 'Número Factura', key: 'numero_factura', width: 20 },
-      { header: 'NIF', key: 'cliente.NIF', width: 20 },
-      { header: 'Nombre', key: 'cliente.nombreCompleto', width: 20 },
+      { header: 'NIF', key: 'NIF', width: 20 },
+      { header: 'Nombre', key: 'nombre', width: 40 },
       { header: 'Concepto', key: 'concepto', width: 30 },
-      { header: 'Base IVA', key: 'base', width: 15 },
+      { header: 'Dirección', key: 'direccion', width: 30 },
+      { header: 'Base', key: 'base', width: 15 },
+      { header: 'Base IVA', key: 'IVA', width: 15 },
     ];
     //Introducimos los datos
-    sheet.addRows([
-      ...facturas.map((factura) => {
-        const fecha = new Date(factura.fecha);
-        fecha.setDate(32);
-        return { ...factura, fecha };
-      }),
-    ]);
-
+    const lineas = facturas.flatMap((factura: any) => {
+      const fechaAnterior = new Date(factura.fecha).getTime();
+      const fecha = new Date(
+        fechaAnterior + 60 * 60 * 2 * 1000,
+      ).toLocaleDateString();
+      const cliente = factura.cliente;
+      const direccion = `${cliente.calle}, ${cliente.localidad} ${cliente.codigo_postal} ${cliente.provincia}`;
+      return factura.expedientes.map((expediente) => {
+        const base = Number(expediente.importe);
+        return {
+          fecha,
+          numero_factura: factura.numero_factura,
+          NIF: factura.cliente.NIF,
+          nombre: factura.cliente.nombreCompleto,
+          direccion: direccion,
+          concepto: '',
+          base,
+          IVA: expediente.IVA,
+        };
+      });
+    });
+    lineas.forEach((linea) => {
+      sheet.addRow(linea);
+    });
     //Guardamos el archivo temporal
     let File = await new Promise((resolve, reject) => {
       tmp.file(
