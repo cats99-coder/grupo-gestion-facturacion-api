@@ -281,20 +281,56 @@ export class FacturasService {
       }/${fechaMasDos.getFullYear()}`;
       const cliente = factura.cliente;
       const direccion = `${cliente.calle}, ${cliente.localidad} ${cliente.codigo_postal} ${cliente.provincia}`;
-      return factura.expedientes.map((expediente) => {
-        const base = Number(expediente.importe);
-        return {
-          fecha,
-          numero_factura: factura.numero_factura,
-          NIF: factura.cliente.NIF,
-          nombre: factura.cliente.nombreCompleto,
-          direccion: direccion,
-          concepto: '',
-          base,
-          IVA: expediente.IVA,
-        };
+      return factura.expedientes.flatMap((expediente) => {
+        const colaboradores = expediente.colaboradores.reduce(
+          (suma, colaborador) => {
+            return Number(colaborador) + suma;
+          },
+          0,
+        );
+        const importe = Number(expediente.importe);
+        const base = expediente.facturaNoCliente
+          ? importe
+          : importe + colaboradores;
+        if (expediente.suplidos.length === 0) {
+          return {
+            fecha,
+            numero_factura: factura.numero_factura,
+            NIF: factura.cliente.NIF,
+            nombre: factura.cliente.nombreCompleto,
+            direccion: direccion,
+            concepto: '',
+            base,
+            IVA: expediente.IVA,
+          };
+        }
+        return [
+          {
+            fecha,
+            numero_factura: factura.numero_factura,
+            NIF: factura.cliente.NIF,
+            nombre: factura.cliente.nombreCompleto,
+            direccion: direccion,
+            concepto: '',
+            base,
+            IVA: expediente.IVA,
+          },
+          ...expediente.suplidos.flatMap((suplido) => {
+            return {
+              fecha,
+              numero_factura: factura.numero_factura,
+              NIF: factura.cliente.NIF,
+              nombre: factura.cliente.nombreCompleto,
+              direccion: direccion,
+              concepto: '',
+              base: suplido.importe,
+              IVA: 0,
+            };
+          }),
+        ];
       });
     });
+    console.log(lineas);
     lineas.forEach((linea) => {
       sheet.addRow(linea);
     });
