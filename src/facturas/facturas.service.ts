@@ -288,7 +288,7 @@ export class FacturasService {
           0,
         );
         const importe = Number(expediente.importe);
-        const NIF = factura.cliente.NIF.toUppercase();
+        const NIF = factura.cliente.NIF.toUpperCase();
         const base = expediente.facturaNoCliente
           ? importe
           : importe + colaboradores;
