@@ -270,15 +270,14 @@ export class FacturasService {
       { header: 'Concepto', key: 'concepto', width: 30 },
       { header: 'Dirección', key: 'direccion', width: 30 },
       { header: 'Base', key: 'base', width: 15 },
-      { header: 'Base IVA', key: 'IVA', width: 15 },
+      { header: 'IVA', key: 'IVA', width: 15 },
+      { header: 'Base IVA', key: 'baseIVA', width: 15 },
+      { header: 'Suplido', key: 'suplido', width: 15 },
     ];
     //Introducimos los datos
     const lineas = facturas.flatMap((factura: any) => {
       const fechaAnterior = new Date(factura.fecha).getTime();
-      const fechaMasDos = new Date(fechaAnterior + 60 * 60 * 2 * 1000);
-      const fecha = `${fechaMasDos.getDate()}/${
-        fechaMasDos.getMonth() + 1
-      }/${fechaMasDos.getFullYear()}`;
+      const fecha = new Date(fechaAnterior + 60 * 60 * 2 * 1000);
       const cliente = factura.cliente;
       const direccion = `${cliente.calle}, ${cliente.localidad} ${cliente.codigo_postal} ${cliente.provincia}`;
       return factura.expedientes.flatMap((expediente) => {
@@ -314,6 +313,7 @@ export class FacturasService {
             concepto: '',
             base,
             IVA: expediente.IVA,
+            baseIVA: base * (expediente.IVA / 100),
           },
           ...expediente.suplidos.flatMap((suplido) => {
             return {
@@ -322,20 +322,21 @@ export class FacturasService {
               NIF: factura.cliente.NIF,
               nombre: factura.cliente.nombreCompleto,
               direccion: direccion,
-              concepto: '',
+              concepto: suplido.concepto,
               base: suplido.importe,
               IVA: 0,
+              suplido: 'X',
+              baseIVA: 0,
             };
           }),
         ];
       });
     });
-    console.log(lineas);
     lineas.forEach((linea) => {
       sheet.addRow(linea);
     });
     //Guardamos el archivo temporal
-    let File = await new Promise((resolve, reject) => {
+    const File = await new Promise((resolve) => {
       tmp.file(
         {
           discardDescriptor: true,
