@@ -301,6 +301,7 @@ export class FacturasService {
             concepto: '',
             base,
             IVA: expediente.IVA,
+            baseIVA: base * (expediente.IVA / 100),
           };
         }
         return [
