@@ -288,6 +288,7 @@ export class FacturasService {
           0,
         );
         const importe = Number(expediente.importe);
+        const NIF = factura.cliente.NIF.toUppercase();
         const base = expediente.facturaNoCliente
           ? importe
           : importe + colaboradores;
@@ -295,7 +296,7 @@ export class FacturasService {
           return {
             fecha,
             numero_factura: factura.numero_factura,
-            NIF: factura.cliente.NIF,
+            NIF,
             nombre: factura.cliente.nombreCompleto,
             direccion: direccion,
             concepto: `N/F ${factura.numero_factura}`,
@@ -308,7 +309,7 @@ export class FacturasService {
           {
             fecha,
             numero_factura: factura.numero_factura,
-            NIF: factura.cliente.NIF,
+            NIF,
             nombre: factura.cliente.nombreCompleto,
             direccion: direccion,
             concepto: `N/F ${factura.numero_factura}`,
@@ -320,7 +321,7 @@ export class FacturasService {
             return {
               fecha,
               numero_factura: factura.numero_factura,
-              NIF: factura.cliente.NIF,
+              NIF,
               nombre: factura.cliente.nombreCompleto,
               direccion: direccion,
               concepto: suplido.concepto,
